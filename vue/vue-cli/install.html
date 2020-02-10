@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>vue-cli 3.0 的安装及使用</h4><p>首先说明vue-cli使用了webpack，webpack需要nodejs，所以需要先下载安装nodejs，这一步这里省略。</p><p>nodejs安装完成后，打开命令行：</p><p>创建文件夹，初始化</p><pre class="brush:bash;toolbar:false;">mkdir&nbsp;webpack
+cd&nbsp;webpack
+npm&nbsp;init&nbsp;-y</pre><p>安装国内镜像（也可以不安装，这一步可以跳过）</p><pre class="brush:bash;toolbar:false">//安装阿里cnpm
+npm&nbsp;install&nbsp;-g&nbsp;cnpm&nbsp;--registry=https://registry.npm.taobao.org
+//测试命令
+cnpm&nbsp;-v
+//修改npm的默认url
+npm&nbsp;config&nbsp;set&nbsp;registry&nbsp;https://registry.npm.taobao.org
+//验证是否成功
+npm&nbsp;config&nbsp;get&nbsp;registry</pre><p>关于npm install的说明：</p><p>npm install --save 即 npm i -S<span style="white-space: pre;">	</span>写入dependencies 里面的插件只用于开发环境，不用于生产环境</p><p>npm install --save-dev 即 npm i -D<span style="white-space:pre">	</span>写入devDependencies 是需要发布到生产环境的</p><hr/><p>1.npm install本地安装</p><p>（1）将安装包放在 ./node_modules 下（运行 npm 命令时所在的目录），如果没有 node_modules 目录，会在当前执行 npm 命令的目录下生成 node_modules 目录。</p><p>（2）可以通过 require() 来引入本地安装的包。</p><p>2.npm install -g全局安装</p><p>(1) 将安装包放在 /usr/local 下或者你 node 的安装目录。</p><p>(2)可以直接在命令行里使用。</p><p>3.npm install --save</p><p>(1)会把msbuild包安装到node_modules目录中</p><p>(2)会在package.json的dependencies属性下添加msbuild</p><p>(3)之后运行npm install命令时，会自动安装msbuild到node_modules目录中</p><p>(4)之后运行npm install --production或者注明NODE_ENV变量值为production时，会自动安装msbuild到node_modules目录中</p><p>4.npm install --save-dev</p><p>(1)会把msbuild包安装到node_modules目录中</p><p>(2)会在package.json的devDependencies属性下添加msbuild</p><p>(3)之后运行npm install命令时，会自动安装msbuild到node_modules目录中</p><p>(4)之后运行npm install --production或者注明NODE_ENV变量值为production时，不会自动安装msbuild到node_modules目录中</p><hr/><p>正式安装vue-cli：npm install -g @vue/cli</p><pre class="brush:bash;toolbar:false">npm&nbsp;install&nbsp;-g&nbsp;@vue/cli
+
+&gt;&nbsp;core-js@3.2.0&nbsp;postinstall&nbsp;C:\Users\PC\AppData\Roaming\npm\node_modules\@vue\cli\node_modules\core-js
+&gt;&nbsp;node&nbsp;scripts/postinstall&nbsp;||&nbsp;echo&nbsp;&quot;ignore&quot;
+
+Thank&nbsp;you&nbsp;for&nbsp;using&nbsp;core-js&nbsp;(&nbsp;https://github.com/zloirock/core-js&nbsp;)&nbsp;for&nbsp;polyfilling&nbsp;JavaScript&nbsp;standard&nbsp;library!
+
+The&nbsp;project&nbsp;needs&nbsp;your&nbsp;help!&nbsp;Please&nbsp;consider&nbsp;supporting&nbsp;of&nbsp;core-js&nbsp;on&nbsp;Open&nbsp;Collective&nbsp;or&nbsp;Patreon:&nbsp;
+&gt;&nbsp;https://opencollective.com/core-js&nbsp;
+&gt;&nbsp;https://www.patreon.com/zloirock&nbsp;
+
+Also,&nbsp;the&nbsp;author&nbsp;of&nbsp;core-js&nbsp;(&nbsp;https://github.com/zloirock&nbsp;)&nbsp;is&nbsp;looking&nbsp;for&nbsp;a&nbsp;good&nbsp;job&nbsp;-)
+
+
+&gt;&nbsp;protobufjs@6.8.8&nbsp;postinstall&nbsp;C:\Users\PC\AppData\Roaming\npm\node_modules\@vue\cli\node_modules\protobufjs
+&gt;&nbsp;node&nbsp;scripts/postinstall
+
+
+&gt;&nbsp;nodemon@1.19.1&nbsp;postinstall&nbsp;C:\Users\PC\AppData\Roaming\npm\node_modules\@vue\cli\node_modules\nodemon
+&gt;&nbsp;node&nbsp;bin/postinstall&nbsp;||&nbsp;exit&nbsp;0
+
+Love&nbsp;nodemon?&nbsp;You&nbsp;can&nbsp;now&nbsp;support&nbsp;the&nbsp;project&nbsp;via&nbsp;the&nbsp;open&nbsp;collective:
+&nbsp;&gt;&nbsp;https://opencollective.com/nodemon/donate
+
+npm&nbsp;WARN&nbsp;optional&nbsp;SKIPPING&nbsp;OPTIONAL&nbsp;DEPENDENCY:&nbsp;fsevents@1.2.9&nbsp;(node_modules\@vue\cli\node_modules\fsevents):
+npm&nbsp;WARN&nbsp;notsup&nbsp;SKIPPING&nbsp;OPTIONAL&nbsp;DEPENDENCY:&nbsp;Unsupported&nbsp;platform&nbsp;for&nbsp;fsevents@1.2.9:&nbsp;wanted&nbsp;{&quot;os&quot;:&quot;darwin&quot;,&quot;arch&quot;:&quot;any&quot;}&nbsp;(current:&nbsp;{&quot;os&quot;:&quot;win32&quot;,&quot;arch&quot;:&quot;x64&quot;})
+
++&nbsp;@vue/cli@3.10.0
+added&nbsp;848&nbsp;packages&nbsp;from&nbsp;576&nbsp;contributors&nbsp;in&nbsp;286.687s</pre><p>使用 vue create hello-world 命令快速创建一个 hello-world</p><pre class="brush:bash;toolbar:false">vue&nbsp;create&nbsp;hello-world
+
+Vue&nbsp;CLI&nbsp;v3.10.0
+?&nbsp;Please&nbsp;pick&nbsp;a&nbsp;preset:&nbsp;default&nbsp;(babel,&nbsp;eslint)
+
+
+Vue&nbsp;CLI&nbsp;v3.10.0
+?&nbsp;&nbsp;Creating&nbsp;project&nbsp;in&nbsp;C:\workspace\vue\hello-world.
+?&nbsp;&nbsp;Initializing&nbsp;git&nbsp;repository...
+?&nbsp;&nbsp;Installing&nbsp;CLI&nbsp;plugins.&nbsp;This&nbsp;might&nbsp;take&nbsp;a&nbsp;while...
+
+
+&gt;&nbsp;yorkie@2.0.0&nbsp;install&nbsp;C:\workspace\vue\hello-world\node_modules\yorkie
+&gt;&nbsp;node&nbsp;bin/install.js
+
+setting&nbsp;up&nbsp;Git&nbsp;hooks
+done
+
+
+&gt;&nbsp;core-js@2.6.9&nbsp;postinstall&nbsp;C:\workspace\vue\hello-world\node_modules\core-js
+&gt;&nbsp;node&nbsp;scripts/postinstall&nbsp;||&nbsp;echo&nbsp;&quot;ignore&quot;
+
+added&nbsp;1171&nbsp;packages&nbsp;from&nbsp;919&nbsp;contributors&nbsp;and&nbsp;audited&nbsp;23902&nbsp;packages&nbsp;in&nbsp;255.494s
+found&nbsp;0&nbsp;vulnerabilities
+
+?&nbsp;&nbsp;Invoking&nbsp;generators...
+?&nbsp;&nbsp;Installing&nbsp;additional&nbsp;dependencies...
+
+added&nbsp;36&nbsp;packages&nbsp;from&nbsp;27&nbsp;contributors,&nbsp;updated&nbsp;2&nbsp;packages,&nbsp;moved&nbsp;9&nbsp;packages&nbsp;and&nbsp;audited&nbsp;24192&nbsp;packages&nbsp;in&nbsp;75.514s
+found&nbsp;0&nbsp;vulnerabilities
+
+?&nbsp;&nbsp;Running&nbsp;completion&nbsp;hooks...
+
+?&nbsp;&nbsp;Generating&nbsp;README.md...
+
+?&nbsp;&nbsp;Successfully&nbsp;created&nbsp;project&nbsp;hello-world.
+?&nbsp;&nbsp;Get&nbsp;started&nbsp;with&nbsp;the&nbsp;following&nbsp;commands:
+
+&nbsp;$&nbsp;cd&nbsp;hello-world
+&nbsp;$&nbsp;npm&nbsp;run&nbsp;serve
+
+&nbsp;WARN&nbsp;&nbsp;Skipped&nbsp;git&nbsp;commit&nbsp;due&nbsp;to&nbsp;missing&nbsp;username&nbsp;and&nbsp;email&nbsp;in&nbsp;git&nbsp;config.
+You&nbsp;will&nbsp;need&nbsp;to&nbsp;perform&nbsp;the&nbsp;initial&nbsp;commit&nbsp;yourself.</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

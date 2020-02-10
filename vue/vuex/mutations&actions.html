@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>mutation<span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">&amp;</span>actions 修改state中的数据</h4><h4><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;"></span></h4><p style="white-space: normal;">vue规定使用mutation和actions修改state中的数据。</p><p style="white-space: normal;">mutation必须是同步函数(但使用setTimeout仍然是有效的)。</p><p style="white-space: normal;">actions可以包含任意异步操作。</p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">基于vue-cli的示例：</p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">页面实际展示内容：</p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><img src="../../image/mutations&actions.gif"/></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">代码：</p><p><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">main.js</span></p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+import&nbsp;store&nbsp;from&nbsp;&#39;./store/vuexStore&#39;&nbsp;//引入状态管理&nbsp;store&nbsp;,PS:名称只能是store,如变更会导致组件中无法获取到
+new&nbsp;Vue({
+&nbsp;&nbsp;store,//注册store(这可以把&nbsp;store&nbsp;的实例注入所有的子组件),PS:名称只能是store,如变更会导致组件中无法获取到
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">vuexStore.js&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">&nbsp;vuex的定义，在main.js中import</span></span><br/></p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;;
+import&nbsp;Vuex&nbsp;from&nbsp;&#39;vuex&#39;;&nbsp;//引入&nbsp;vuex
+Vue.use(Vuex);&nbsp;//使用&nbsp;vuex
+const&nbsp;&nbsp;state&nbsp;=&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;初始化状态
+&nbsp;&nbsp;&nbsp;&nbsp;stateData9:&quot;mutation演示&quot;,
+}
+
+export&nbsp;default&nbsp;new&nbsp;Vuex.Store({
+&nbsp;&nbsp;&nbsp;&nbsp;state:state,
+&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;mutation&nbsp;必须是同步函数(但使用setTimeout仍然是有效的)
+&nbsp;&nbsp;&nbsp;&nbsp;mutations:&nbsp;{//提交(修改)state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mutationData1:function(state,payload){//只接受2个参数，参数1：state，参数2：传入参数
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;经过mutationData1传入参数为&quot;+payload);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state.stateData9+=&quot;:经过mutations被变更了，传入参数为&quot;+payload;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*&nbsp;&nbsp;使用ES6的自动生成修改方法的骚操作，必须在外提前定义state，但是有代价（代码静态检查完蛋了）来自参考：https://forum.vuejs.org/t/vuex-state/39459/5
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...Object.keys(state).reduce((obj,&nbsp;key)&nbsp;=&gt;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...obj,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[key]:&nbsp;(state,&nbsp;payload)&nbsp;=&gt;&nbsp;state[key]&nbsp;=&nbsp;payload,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;{})
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//自动生成并对传参类型进行限制的示例
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...Object.keys(state).reduce((obj,&nbsp;key)&nbsp;=&gt;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...obj,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[key]:&nbsp;(state,&nbsp;payload)&nbsp;=&gt;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//window.console.info(state[key])
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//window.console.info(payload)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch&nbsp;(Object.prototype.toString.call(state[key]))&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Number]&quot;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&quot;[object&nbsp;Number]&quot;==Object.prototype.toString.call(state[key]))state[key]&nbsp;=&nbsp;payload
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;window.console.error(&quot;传入参数类型错误:Number&nbsp;&quot;+state[key]);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Array]&quot;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;String]&quot;:state[key]&nbsp;=&nbsp;payload
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Boolean]&quot;:state[key]&nbsp;=&nbsp;payload
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Null]&quot;:state[key]&nbsp;=&nbsp;payload
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Undefined]&quot;:state[key]&nbsp;=&nbsp;payload
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;&quot;[object&nbsp;Object]&quot;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;{})
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;actions:&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//名称可以与mutations相同，可以调用多个mutations（分发）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;actionData1&nbsp;(context,payload)&nbsp;{//只接受2个参数，参数1：context，参数2：传入参数
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//context&nbsp;是&nbsp;store&nbsp;实例具有相同方法和属性的&nbsp;context&nbsp;对象,但&nbsp;context&nbsp;不是&nbsp;store&nbsp;本身
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;context.commit(&#39;mutationData1&#39;,payload);//通过&nbsp;commit&nbsp;调用&nbsp;mutations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;setTimeout(()&nbsp;=&gt;&nbsp;{//可以包含任意异步操作
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;context.commit(&#39;mutationData1&#39;,&#39;异步操作1&#39;);//通过&nbsp;commit&nbsp;调用&nbsp;mutations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;1000)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;setTimeout(()&nbsp;=&gt;&nbsp;{//可以包含任意异步操作
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;context.commit(&#39;mutationData1&#39;,&#39;异步操作2&#39;);//通过&nbsp;commit&nbsp;调用&nbsp;mutations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;2000)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;actionData2&nbsp;(context,payload)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;payload;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;context.dispatch(&#39;actionData1&#39;);//通过&nbsp;dispatch&nbsp;调用其他&nbsp;actions
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//利用ES6+?新特性&nbsp;async/await&nbsp;组合&nbsp;actions
+&nbsp;&nbsp;&nbsp;&nbsp;},
+})</pre><p><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">Example.vue</span></p><pre class="brush:html;toolbar:false;">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;{{this.$store.state.stateData9}}&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;button&quot;&nbsp;value=&quot;VUEX触发&quot;&nbsp;@click=&#39;vuexClick&#39;&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;vuexClick(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//获取state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.$store.state.stateData1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//获取getters
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.$store.getters.getterData2;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//修改state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//this.$store.state.stateData1=&quot;直接修改&quot;;//直接修改，可以修改但不推荐
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//调用&nbsp;commit()&nbsp;通过&nbsp;mutations&nbsp;修改&nbsp;state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.$store.commit(&#39;mutationData1&#39;,2);//只接受2个参数，参数1：mutations名称，参数2：传入参数
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//调用&nbsp;dispatch()&nbsp;通过&nbsp;actions&nbsp;修改&nbsp;state,（PS:在&nbsp;actions&nbsp;中仍然要通过&nbsp;commit()&nbsp;调用&nbsp;mutations&nbsp;修改）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.$store.dispatch(&#39;actionData1&#39;,2);//只接受2个参数，参数1：actions名称，参数2：传入参数
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

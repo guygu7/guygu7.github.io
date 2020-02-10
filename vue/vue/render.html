@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>render函数</h4><p><span style="color: #6a9955;"></span></p><p>render是DOM渲染函数，因VUE推荐使用template，故本例只做简单说明。</p><p>基于vue-cli的示例：</p><p>Example.vue&nbsp;</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;render后整个被替换,此处没有被替换
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;//render是DOM渲染函数，VUE推荐使用template
+&nbsp;&nbsp;//vue&nbsp;单文件里并没有&nbsp;render&nbsp;方法，因此这里不会执行
+&nbsp;&nbsp;render:function(creatElements){//render函数会将return中的组件完全替换本组件
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;creatElements(&#39;h&#39;,{props:{value:&#39;&#39;}});
+&nbsp;&nbsp;},
+&nbsp;&nbsp;/**简化后的，main.js就是简化后的
+&nbsp;&nbsp;&nbsp;*&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(Example9_Watch_Computed_)
+&nbsp;&nbsp;&nbsp;*/
+};
+&lt;/script&gt;</pre><p><br/></p><!--!doctype-->  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>watch监听 事件监听 data数据监听<!--!doctype--></h4><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;&lt;!--&nbsp;事件监听&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-model=&quot;v_model_value1&quot;&nbsp;@keyup=&quot;v_model_change&quot;&gt;+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-model=&quot;v_model_value2&quot;&nbsp;@keyup=&quot;v_model_change&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{v_model_value3&nbsp;}}
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;&lt;!--&nbsp;watch&nbsp;监听&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-model=&quot;watch_value1&quot;&gt;+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-model=&quot;watch_value2&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;多次引用也只会调用一次watch，不会多次调用&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{watch_value3}}&lt;br&gt;{{watch_value3}}&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;watch监听对象中属性的变化&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;button&quot;&nbsp;value=&quot;watchObj&quot;&nbsp;@click=&quot;watchObj&quot;&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{v_model_value1:&quot;&quot;,v_model_value2:&quot;&quot;,v_model_value3:&quot;&quot;,
+&nbsp;&nbsp;&nbsp;&nbsp;watch_value1:&quot;&quot;,watch_value2:&quot;&quot;,watch_value3:&quot;&quot;,
+&nbsp;&nbsp;&nbsp;&nbsp;watchObj1:{attr1:1}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;//事件监听
+&nbsp;&nbsp;&nbsp;&nbsp;v_model_change(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.v_model_value3=this.v_model_value1+this.v_model_value2;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;watchObj(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.watchObj1.attr1++;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;watch:{//watch&nbsp;监听&nbsp;data,安装VUE&nbsp;Router后，可以监听this.$route
+&nbsp;&nbsp;&nbsp;&nbsp;watch_value1(newVal,oldVal){//监听data属性watch_value1变化，newVal为新的值，oldVal为变化后的值
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(newVal+&quot;---&quot;+oldVal);window.console.info(this);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.watch_value3=newVal+this.watch_value2;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;watch_value2(newVal,oldVal){//监听data属性watch_value2变化，newVal为新的值，oldVal为变化后的值
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(newVal+&quot;---&quot;+oldVal);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.watch_value3=this.watch_value1+newVal;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;//可以直接监听数组，但对象不行,对象需要深度监听
+&nbsp;&nbsp;&nbsp;&nbsp;&#39;watchObj1.attr1&#39;:function(newVal,oldVal){//监听对象单个属性
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;watchObj&nbsp;被调用&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(newVal+oldVal);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;watchObj1:{//监听整个对象的写法
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handler(newVal){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;watchObj&nbsp;handler&nbsp;被调用&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(newVal);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deep:true
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//immediate:boolean;略
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;//此外如安装VUE&nbsp;Router，可以监听this.$route，但其他$属性似乎不行
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

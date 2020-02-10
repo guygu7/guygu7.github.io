@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>class和style绑定数据 动态更新</strong></p><p>基于vue-cli的示例</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;button&quot;&nbsp;value=&quot;切换class_Flag&quot;&nbsp;@click=&quot;class_Flag=!class_Flag&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;class&nbsp;:&nbsp;使用&nbsp;v-bind&nbsp;&nbsp;&nbsp;（style&nbsp;和&nbsp;class&nbsp;相同）--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;[&#39;bold&#39;,&#39;italic&#39;,&#39;active&#39;]&quot;&gt;class样式演示&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以使用三元表达式&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;[&#39;bold&#39;,class_Flag?&#39;&#39;:&#39;italic&#39;]&quot;&gt;class样式演示1&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以使用对象代替三元表达式&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;[&#39;bold&#39;,{&#39;italic&#39;:class_Flag}]&quot;&gt;class样式演示2&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以使用对象，对象属性是class类名，对象属性可以不带引号&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;{&#39;bold&#39;:true,italic:true,active:true}&quot;&gt;class样式演示3&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以使用data中保存的对象&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;class_obj&quot;&gt;class样式演示4&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以使用数组，引用多个对象&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;:class=&quot;[class_obj,class_obj2]&quot;&gt;class样式演示5&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;style&nbsp;和&nbsp;class&nbsp;相同&nbsp;--&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">//script
+&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class_Flag:true,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class_obj:{&#39;bold&#39;:true,italic:true},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class_obj2:{active:true}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><pre class="brush:css;toolbar:false">&lt;style&gt;
+.bold&nbsp;{
+&nbsp;&nbsp;font-weight:&nbsp;bold;
+}
+.italic&nbsp;{
+&nbsp;&nbsp;font-style:&nbsp;italic;
+}
+.active&nbsp;{
+&nbsp;&nbsp;letter-spacing:&nbsp;0.5em;
+}
+&lt;/style&gt;</pre><p><br/></p><p><strong><br/></strong></p><p><strong><br/></strong></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

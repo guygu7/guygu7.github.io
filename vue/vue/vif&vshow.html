@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>v-if&amp;v-show 隐藏和显示页面元素</strong></p><p></p><p>基于vue-cli的示例</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-if&nbsp;将元素从页面移除，v-show&nbsp;将元素隐藏display:none，而不移除&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;button&quot;&nbsp;value=&quot;切换v-if&nbsp;v-show&nbsp;flag&quot;&nbsp;@click=&quot;v_if_show_Flag=!v_if_show_Flag&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-if=&quot;v_if_show_Flag&quot;&gt;v-if&nbsp;隐藏时将元素从页面完全移除&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-show=&quot;v_if_show_Flag&quot;&gt;v-show&nbsp;将元素隐藏display:none，而不移除&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">//script
+&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v_if_show_Flag:true,
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

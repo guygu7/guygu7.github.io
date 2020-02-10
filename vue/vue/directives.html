@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>directives自定义指令</h4><p>全局自定义指令和局部（私有）自定义指令同名时，全局自定义指令将无效</p><p>基于vue-cli的示例：</p><p>main.js<br/></p><pre class="brush:js;toolbar:false;">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+/*&nbsp;
+&nbsp;&nbsp;全局自定义指令&nbsp;&nbsp;&nbsp;&nbsp;更多函数查看Vue官网&nbsp;教程-自定义指令-钩子函数&nbsp;https://cn.vuejs.org/v2/guide/custom-directive.html
+&nbsp;&nbsp;参数1:指令名称，定义不加v-，使用加v-;
+&nbsp;&nbsp;参数2:对象，包含指令相关函数，函数会在特定阶段执行
+*/
+Vue.directive(&#39;directiveExample&#39;,{
+&nbsp;&nbsp;//这些被称作&nbsp;&nbsp;选项/生命周期钩子函数,第一个参数el为Element,是原生JS对象
+&nbsp;&nbsp;bind:function(el){//当指令绑定到元素上时，执行bind函数，只执行一次
+&nbsp;&nbsp;&nbsp;&nbsp;el;//元素绑定指令的时候，没有插入DOM，没有渲染，调用&nbsp;el.focus()&nbsp;获得焦点&nbsp;无效果；修改样式&nbsp;el.style.color=blue&nbsp;有效果；
+&nbsp;&nbsp;},
+&nbsp;&nbsp;inserted:function(el){//当元素插入到DOM中后，执行&nbsp;inserted&nbsp;函数，只执行一次
+&nbsp;&nbsp;&nbsp;&nbsp;el.focus();//获得焦点
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;全局自定义指令被触发&quot;);
+&nbsp;&nbsp;},
+&nbsp;&nbsp;updated:function(el){//当VNode更新后，执行&nbsp;updated，每次更新都执行
+&nbsp;&nbsp;&nbsp;&nbsp;el;
+&nbsp;&nbsp;}
+});
+new&nbsp;Vue({
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-directiveExample2&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-directiveExample=&quot;msg&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;text&quot;&nbsp;v-directiveExample=&quot;&#39;bindingDataObj&#39;&quot;&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg:&quot;测试数据1&quot;,
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;},
+&nbsp;&nbsp;directives:{//私有自定义指令,仅当前组件有效
+&nbsp;&nbsp;&nbsp;&nbsp;//同名的全局自定义指令将被覆盖无效
+&nbsp;&nbsp;&nbsp;&nbsp;&#39;directiveExample&#39;:{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//这些被称作&nbsp;&nbsp;选项/生命周期钩子函数,第一个参数el为Element,是原生JS对象
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bind:function(el){//当指令绑定到元素上时，执行bind函数，只执行一次
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;el;//元素绑定指令的时候，没有插入DOM，没有渲染，调用&nbsp;el.focus()&nbsp;获得焦点&nbsp;无效果；修改样式&nbsp;el.style.color=blue&nbsp;有效果；
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inserted:function(el,binding){//当元素插入到DOM中后，执行&nbsp;inserted&nbsp;函数，只执行一次
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;el.focus();//获得焦点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;私有自定义指令被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//第二个参数binding，被封装成一个对象包含多个属性
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(binding.value);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(binding.expression);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(binding);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;updated:function(el){//当VNode更新后，执行&nbsp;updated，每次更新都执行
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;el;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;//简写，该函数同时由&nbsp;bind&nbsp;updated&nbsp;触发
+&nbsp;&nbsp;&nbsp;&nbsp;&#39;directiveExample2&#39;:function(el,binding){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;el;binding;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;简写指令被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><p><br/></p><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

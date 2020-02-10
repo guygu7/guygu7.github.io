@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>style<!--!doctype--></h4><p>使用对应的sass-loader less-loader后可以直接在 .vue 文件中写 scss less<br/></p><p>基于vue-cli的示例</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;style样式
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{};
+&lt;/script&gt;</pre><pre class="brush:css;toolbar:false">&lt;style&nbsp;lang=&quot;scss&quot;&nbsp;scoped&gt;
+/*&nbsp;scoped&nbsp;表示仅当前组件有效，不加scoped则会全局生效，一般都加上&nbsp;*/
+div{
+&nbsp;&nbsp;color:blueviolet;
+}
+/*&nbsp;启用&nbsp;scss&nbsp;less&nbsp;需要设置&nbsp;lang&nbsp;属性&nbsp;*/
+body{
+&nbsp;&nbsp;div{
+&nbsp;&nbsp;&nbsp;&nbsp;font-style:&nbsp;italic;
+&nbsp;&nbsp;}
+}
+&lt;/style&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

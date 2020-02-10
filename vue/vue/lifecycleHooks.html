@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>LifecycleHooks生命周期钩子函数</h4><p>基于vue-cli的示例：</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;修改值&quot;&nbsp;@click=&quot;add&quot;&nbsp;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;生命周期&nbsp;{{msg}}
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{msg:&quot;生命周期函数测试数据&nbsp;data&nbsp;&quot;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;method(){window.console.info(&quot;生命周期函数测试方法&nbsp;method&nbsp;&quot;)},
+&nbsp;&nbsp;&nbsp;&nbsp;add(){this.msg+=&quot;+1&quot;},
+&nbsp;&nbsp;},
+&nbsp;&nbsp;//生命周期函数
+&nbsp;&nbsp;beforeCreate(){//实例被创建之前
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;beforeCreate&nbsp;被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(this.msg);//data&nbsp;methods&nbsp;等&nbsp;都未初始化
+&nbsp;&nbsp;&nbsp;&nbsp;//method();//未初始化，调用将报错
+&nbsp;&nbsp;},
+&nbsp;&nbsp;created(){//实例被创建之后
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;created&nbsp;被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(this.msg);//data&nbsp;methods&nbsp;等&nbsp;已被初始化
+&nbsp;&nbsp;&nbsp;&nbsp;this.method();
+&nbsp;&nbsp;},
+&nbsp;&nbsp;beforeMount(){//挂载(渲染)到页面上之前
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;beforeMount&nbsp;被触发&quot;);
+&nbsp;&nbsp;},
+&nbsp;&nbsp;mounted(){//挂载(渲染)到页面上之后
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;mounted&nbsp;被触发&quot;);
+&nbsp;&nbsp;},
+&nbsp;&nbsp;beforeUpdate(){//运行时&nbsp;data&nbsp;更新之前
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;beforeUpdate&nbsp;被触发&quot;);
+&nbsp;&nbsp;},
+&nbsp;&nbsp;updated(){//运行时&nbsp;data&nbsp;更新之后
+&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;生命周期函数&nbsp;updated&nbsp;被触发&quot;);
+&nbsp;&nbsp;},
+&nbsp;&nbsp;//销毁
+&nbsp;&nbsp;beforeDestroy(){window.console.info(&quot;生命周期函数&nbsp;beforeDestroy&nbsp;被触发&quot;);},
+&nbsp;&nbsp;destroyed(){window.console.info(&quot;生命周期函数&nbsp;destroyed&nbsp;被触发&quot;);},
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

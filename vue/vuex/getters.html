@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>getters的定义及使用<br/></h4><p>vuex中的getters类似vue的计算属性computed，且可以嵌套在一个getter中调用另一个getter</p><p>基于vue-cli的示例：</p><p>页面实际展示内容：</p><p><img src="../../image/vuexGetters.png"/></p><p>main.js</p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+import&nbsp;store&nbsp;from&nbsp;&#39;./store/vuexStore&#39;&nbsp;//引入状态管理&nbsp;store&nbsp;,PS:名称只能是store,如变更会导致组件中无法获取到
+new&nbsp;Vue({
+&nbsp;&nbsp;store,//注册store(这可以把&nbsp;store&nbsp;的实例注入所有的子组件),PS:名称只能是store,如变更会导致组件中无法获取到
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p>vuexStore.js&nbsp; &nbsp; vuex的定义，在main.js中import</p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;;
+import&nbsp;Vuex&nbsp;from&nbsp;&#39;vuex&#39;;&nbsp;//引入&nbsp;vuex
+Vue.use(Vuex);&nbsp;//使用&nbsp;vuex
+const&nbsp;&nbsp;state&nbsp;=&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;初始化状态
+&nbsp;&nbsp;&nbsp;&nbsp;stateData1:0
+}
+export&nbsp;default&nbsp;new&nbsp;Vuex.Store({
+&nbsp;&nbsp;&nbsp;&nbsp;state:state,
+&nbsp;&nbsp;&nbsp;&nbsp;getters:&nbsp;{//类似计算属性，返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getterData1:&nbsp;state&nbsp;=&gt;&nbsp;{//接受第一个参数state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;state.stateData8+&quot;:经过getters被变更了&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getterData2:&nbsp;(state,getters)&nbsp;=&gt;&nbsp;{//接受第二个参数getters,并可通过其调用其他getter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;getters.getterData1+&quot;,并且被再次变更了&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;},
+})</pre><p>Example.vue&nbsp;&nbsp;&nbsp;&nbsp;getters同state一样，可以直接使用<br/></p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;{{this.$store.getters.getterData2}}
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;//无需js
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

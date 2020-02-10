@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>VUE 事件修饰符(事件传递机制)</strong></p><p>基于vue-cli的示例</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;事件修饰符(事件传递机制)&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click=&#39;div1Handler&#39;&nbsp;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第一层&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;&lt;br&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.stop&nbsp;阻止冒泡&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click=&#39;div1Handler&#39;&nbsp;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.stop&nbsp;阻止冒泡&nbsp;：&nbsp;第一层&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click.stop=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.prevent&nbsp;阻止默认行为&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a&nbsp;href=&quot;http://www.baidu.com&quot;&nbsp;@click=&#39;linkClick&#39;&gt;跳转百度&lt;/a&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a&nbsp;href=&quot;http://www.baidu.com&quot;&nbsp;@click.prevent=&#39;linkClick&#39;&gt;.prevent&nbsp;阻止&nbsp;跳转百度&lt;/a&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.capture&nbsp;添加事件侦听器使用事件捕获模式(外层被先触发)&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click.capture=&#39;div1Handler&#39;&nbsp;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.capture&nbsp;添加事件侦听器使用事件捕获模式(外层被先触发)&nbsp;：&nbsp;第一层&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;&lt;br&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.self&nbsp;只触发自身点击事件&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click.self=&#39;div1Handler&#39;&nbsp;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.self&nbsp;只触发自身点击事件&nbsp;：&nbsp;第一层&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;&lt;br&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.once&nbsp;只触发一次事件&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click.once=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;可以和其他事件修饰一起用，先后顺序没有影响&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a&nbsp;href=&quot;http://www.baidu.com&quot;&nbsp;@click.prevent.once=&#39;linkClick&#39;&gt;.once&nbsp;跳转百度&lt;/a&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a&nbsp;href=&quot;http://www.baidu.com&quot;&nbsp;@click.once.prevent=&#39;linkClick&#39;&gt;.once&nbsp;跳转百度&lt;/a&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;.stop&nbsp;和&nbsp;.self&nbsp;的区别&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click=&#39;div1Handler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第一层
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer2&quot;&nbsp;@click=&#39;div2Handler&#39;&gt;&lt;!--&nbsp;往上全部被阻止&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第二层&nbsp;往上全部被阻止&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click.stop=&#39;btnHandler&#39;&gt;.stop
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;&lt;br&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer1&quot;&nbsp;@click=&#39;div1Handler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第一层
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class=&quot;layer2&quot;&nbsp;@click.self=&#39;div2Handler&#39;&gt;&lt;!--&nbsp;只有自己被阻止&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.self&nbsp;第二层&nbsp;只有自己被阻止&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;事件修饰符测试&quot;&nbsp;@click=&#39;btnHandler&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">//script
+&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;//事件修饰符(事件传递机制)
+&nbsp;&nbsp;&nbsp;&nbsp;div1Handler(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;div1事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;div1事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;div2Handler(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;div2事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;div2事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;btnHandler(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;按钮点击事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;按钮点击事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;linkClick(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;链接点击事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;链接点击事件被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><pre class="brush:css;toolbar:false">&lt;style&gt;
+.layer1&nbsp;{
+&nbsp;&nbsp;background-color:&nbsp;rgb(83,&nbsp;194,&nbsp;240);
+}
+.layer2&nbsp;{
+&nbsp;&nbsp;background-color:&nbsp;rgb(121,&nbsp;139,&nbsp;78);
+}
+&lt;/style&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

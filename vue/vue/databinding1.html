@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>VUE单向数据绑定</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>VUE单向数据绑定</strong></p><p>基于vue-cli</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;插值表达式：在加载完成前页面会直接显示{{msg}}而不是其所等于的值，在加载完成后才会替换&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;{{msg}}&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-cloak:&nbsp;1.能够解决&nbsp;插值表达式被直接显示的问题，在加载完成前，不会显示;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.不会覆盖原文本内容--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-cloak&gt;{{msg}}原文本内容&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-text:&nbsp;&nbsp;1.能够解决&nbsp;插值表达式被直接显示的问题，在加载完成前，不会显示;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.会覆盖原文本内容--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-text=&quot;msg1&quot;&gt;{{msg}}原文本内容被覆盖&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;html解析,不会解析html，直接转义显示&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;{{html}}&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-text=&#39;html&#39;&gt;&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-html:&nbsp;&nbsp;1.能够解决&nbsp;插值表达式被直接显示的问题，在加载完成前，不会显示;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.会覆盖原文本内容;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.会将字符串的html解析&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-html=&#39;html&#39;&gt;原文本内容被覆盖&lt;/div&gt;
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;属性绑定数据不能直接这么写&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=bindValue&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-bind:&nbsp;属性绑定数据，可以写合法的js表达式--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;v-bind:value=&quot;bindValue+&#39;+拼接字符串{{msg}}&#39;&quot;&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-bind:&nbsp;可以简写为&nbsp;:属性&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;:value=&quot;bindValue+&#39;+拼接字符串{{msg}}&#39;&quot;&gt;&lt;br&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;
+</pre><pre class="brush:js;toolbar:false">
+//script
+&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg:&#39;测试数据&#39;,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg1:&#39;v-text覆盖原文本&#39;,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;html:&#39;&lt;div&gt;html解析测试&lt;/div&gt;&#39;,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bindValue:&#39;绑定值&#39;,
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();
+    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

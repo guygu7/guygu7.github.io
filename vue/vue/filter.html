@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>filter 全局过滤器 和 局部（私有）过滤器</h4><p>全局过滤器定义位置在 main.js 中<br/></p><p>如果全局过滤器和私有(局部)过滤器同名，则仅会经过和触发私有(局部)过滤器，不会经过和触发全局过滤器</p><p>局部过滤器仅在当前组件中有效，在父子组件中相互都无效</p><p>使用多个过滤器会从左向右顺序触发</p><p>基于vue-cli的示例：</p><p>main.js<br/></p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+
+//全局过滤器，需写在new&nbsp;Vue之前，不可写在其他.vue文件中，因为&nbsp;Vue&nbsp;在局部无法获得取值会是&nbsp;undefind
+Vue.filter(&#39;filter&#39;,function(msg){
+&nbsp;&nbsp;window.console.log(&quot;全局过滤器filter被触发&quot;);
+&nbsp;&nbsp;return&nbsp;msg+&quot;+经过全局过滤器filter&quot;;
+});
+
+new&nbsp;Vue({
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p>App.vue&nbsp;&nbsp;&nbsp;&nbsp;父组件</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Example&gt;&lt;/Example&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">export&nbsp;default&nbsp;{
+&nbsp;&nbsp;name:&nbsp;&#39;app&#39;,
+&nbsp;&nbsp;filters:{//私有(局部)过滤器仅当前组件有效,定义在父组件中的过滤器在子组件中无效
+&nbsp;&nbsp;&nbsp;&nbsp;appfilter:function(msg){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;私有(局部)过滤器Appfilter被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;msg+&quot;+经过私有(局部)过滤器Appfilter&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;},
+}
+&lt;/script&gt;</pre><p>Example.vue&nbsp;&nbsp;&nbsp;&nbsp;子组件</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;&lt;br&gt;{{msg|appfilter}}&lt;br&gt;&nbsp;如果使用会报错，定义在父组件的过滤器appfilter是无效的&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;全局和私有(局部)同名，则仅会经过和触发私有(局部)过滤器，全局过滤器无效&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;全局和私有(局部)过滤器同名测试：&lt;br&gt;{{msg|filter}}&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;多个过滤器从左向右顺序触发：&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;{{msg|privateFilter1(&#39;参数1&#39;,&#39;参数2&#39;)|privateFilter2}}
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg:&quot;测试数据1&quot;,
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;filters:{//私有(局部)过滤器仅当前组件有效
+&nbsp;&nbsp;&nbsp;&nbsp;//私有(局部)过滤器，如和全局过滤器同名，则私有(局部)覆盖全局，全局过滤器失效
+&nbsp;&nbsp;&nbsp;&nbsp;filter:function(msg){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;私有(局部)过滤器filter被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;msg+&quot;+经过私有(局部)过滤器filter&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;//过滤器顺序测试
+&nbsp;&nbsp;&nbsp;&nbsp;privateFilter1:function(msg,arg1,arg2){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;触发器privateFilter1被触发&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;msg+arg1+arg2;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;privateFilter2:function(msg){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.log(&quot;触发器privateFilter2被触发,当前msg=&quot;+msg);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;msg+&quot;+Filter2&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><p>本例中的实际测试结果：</p><p><img src="../../image/vueFilter.png" title="vue过滤器Filert测试" alt="vue过滤器Filert测试"/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>keyCodes按键修饰符 按键捕获（按键监听）</h4><p>需要注意：特殊按键F2等，在不同机器上可能值会不一样；</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VUE 1.x版本和2.x版本的别名定义方式的区别；</p><p>本示例演示了在input内获得焦点时，监听到按键，并获取到按键的值。</p><p>基于vue-cli的示例：</p><p>main.js<br/></p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+//自定义全局按键修饰符
+Vue.config.keyCodes.f2&nbsp;=&nbsp;174;
+//1.x版本&nbsp;Vue.directive(&#39;on&#39;).keyCodes.f2&nbsp;=&nbsp;?;
+new&nbsp;Vue({
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keyup(可以捕获特殊按键):&lt;input&nbsp;type=&quot;text&quot;&nbsp;@keyup=&quot;getKeyCode($event)&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keypress(部分特殊按键无法捕获):&lt;input&nbsp;type=&quot;text&quot;&nbsp;@keypress=&quot;getKeyCode($event)&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;内置:&nbsp;.enter&nbsp;.tab&nbsp;.delete(删除&nbsp;和&nbsp;退格)&nbsp;.esc&nbsp;.space&nbsp;.up&nbsp;.down&nbsp;.left&nbsp;.right
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可通过全局&nbsp;Vue.config.keyCodes&nbsp;自定义别名&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;特殊按键F2等，在不同机器上可能值会不一样不一定是174&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F2:&lt;input&nbsp;type=&quot;text&quot;&nbsp;@keyup.174=&quot;f2press&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;使用全局自定义别名修饰符&nbsp;Vue.config.keyCodes.f2&nbsp;=&nbsp;174;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F2全局自定义别名：&lt;input&nbsp;type=&quot;text&quot;&nbsp;@keyup.f2=&quot;f2press&quot;&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;getKeyCode:function(ev){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(ev.keyCode);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;捕获到当前按键keyCode为&quot;+ev.keyCode);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;f2press:function(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;捕获到F2&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;捕获到F2&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

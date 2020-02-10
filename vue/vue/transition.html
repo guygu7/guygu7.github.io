@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>Transition过渡动画及第三方动画类库animate的使用</h4><p>本示例展示vue自带的过渡效果的使用方法。</p><p>本示例中对第三方动画类库animate的使用仅为class <span style="color: rgb(206, 145, 120);">&quot;animated&nbsp;bounceIn&quot;</span> 和<span style="color: rgb(206, 145, 120);">&nbsp;<span style="color: rgb(206, 145, 120);">&quot;</span>animated&nbsp;bounceOut<span style="color: rgb(206, 145, 120);">&quot;</span></span>。</p><p>效果展示：</p><p><img src="../../image/vueTransition.gif"/></p><p>基于vue-cli的示例：</p><p>main.js</p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App.vue&#39;
+//引入第三方animate类库
+import&nbsp;animate&nbsp;from&nbsp;&#39;animate.css&#39;
+Vue.use(animate);
+new&nbsp;Vue({
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App)
+}).$mount(&#39;#app&#39;)</pre><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&quot;button&quot;&nbsp;value=&quot;过渡动画&quot;&nbsp;@click=&quot;flag=!flag&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;transition&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-if=&quot;flag&quot;&gt;&nbsp;过度动画演示&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/transition&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;自定义&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;transition&nbsp;name=&quot;div&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-if=&quot;flag&quot;&gt;&nbsp;自定义前缀过度动画演示&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/transition&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;使用第三方动画类库animate&nbsp;先安装&nbsp;npm&nbsp;install&nbsp;animate.css&nbsp;--save&nbsp;再引入&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;分别设置入场出场时间&nbsp;:duration=&quot;{enter:100,leave:300}&quot;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;transition&nbsp;enter-active-class=&quot;animated&nbsp;bounceIn&quot;&nbsp;leave-active-class=&quot;animated&nbsp;bounceOut&quot;&nbsp;:duration=&quot;400&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;v-if=&quot;flag&quot;&gt;&nbsp;自定义前缀过度动画演示&lt;/div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/transition&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{flag:false}
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><pre class="brush:css;toolbar:false">&lt;style&gt;
+.v-enter,/*进场动画前，元素起始状态*/
+.v-leave-to{/*2.1.8版及以上&nbsp;离场动画后，离开后的终止状态*/
+&nbsp;&nbsp;opacity:0;
+}
+/*.v-enter-to,/*2.1.8版及以上&nbsp;进场动画后，过渡的结束状态。在元素被插入之后下一帧生效&nbsp;(与此同时&nbsp;v-enter&nbsp;被移除)，在过渡/动画完成之后移除
+.v-leave{/*离场动画前,定义离开过渡的开始状态。在离开过渡被触发时立刻生效，下一帧被移除
+&nbsp;&nbsp;background-color:white;
+}*/
+.v-enter-active,/*进场动画*/
+.v-leave-active{/*离场动画*/
+&nbsp;&nbsp;transition:&nbsp;all&nbsp;1s&nbsp;ease
+}
+
+/*&nbsp;自定义前缀替代v-，可以定义多种过渡动画&nbsp;*/
+.div-enter,/*进场动画前，元素起始状态*/
+.div-leave-to{/*2.1.8版及以上&nbsp;离场动画后，离开后的终止状态*/
+&nbsp;&nbsp;opacity:0;
+}
+.div-enter-active,/*进场动画*/
+.div-leave-active{/*离场动画*/
+&nbsp;&nbsp;transition:&nbsp;all&nbsp;1s&nbsp;ease
+}
+&lt;/style&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

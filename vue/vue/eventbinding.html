@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>VUE事件绑定</strong></p><p>基于vue-cli的示例</p><p>Example.vue</p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-on:&nbsp;事件绑定&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;按钮:事件绑定&quot;&nbsp;v-on:click=&#39;show&#39;&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;v-on:&nbsp;可以简写为&nbsp;@事件&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;按钮:事件绑定&quot;&nbsp;@click=&#39;show&#39;&gt;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;br&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;定时器示例&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;开始&quot;&nbsp;@click=&#39;intervalStart&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input&nbsp;type=&#39;button&#39;&nbsp;value=&quot;停止&quot;&nbsp;@click=&#39;intervalStop&#39;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;{{int}}&lt;/div&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">//script
+&lt;script&gt;
+//关于&nbsp;Vue&nbsp;实例中的&nbsp;this:&nbsp;在Vue实例中，要获取&nbsp;data&nbsp;中的数据&nbsp;或者&nbsp;methods&nbsp;中的方法，必须使用&nbsp;this.&nbsp;访问，这里的&nbsp;this&nbsp;表示&nbsp;Vue&nbsp;实例对象
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;data(){//注意：使用&nbsp;vue&nbsp;cli&nbsp;后，这里是属于组件&nbsp;data&nbsp;必须这么写，和实例&nbsp;data&nbsp;不一样，实例可以是对象
+&nbsp;&nbsp;&nbsp;&nbsp;return{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int:0,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intervalID:null,//定时器ID
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;},
+&nbsp;&nbsp;methods:{//&nbsp;methods&nbsp;属性中定义了当前&nbsp;Vue&nbsp;实例所有可用方法
+&nbsp;&nbsp;&nbsp;&nbsp;show:function(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(&quot;事件绑定测试&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;//定时器示例方法
+&nbsp;&nbsp;&nbsp;&nbsp;intervalStart(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(this.intervalID!=null)return;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.intervalID=setInterval(()=&gt;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.int++;//使用箭头函数，this&nbsp;为&nbsp;Vue&nbsp;实例对象，普通function则this会指向该方法自身
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},1000)
+&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;intervalStop(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clearInterval(this.intervalID);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.intervalID=null;
+&nbsp;&nbsp;&nbsp;&nbsp;},
+};
+&lt;/script&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

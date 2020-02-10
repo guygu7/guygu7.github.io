@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>static-site</title>
+  </head>
+  <body style="background:transparent;">
+<h4>关于SQL递归使用 with as 时碰见的坑</h4><p>使用 WITH AS 递归查询的示例：</p><pre class="brush:sql;toolbar:false">WITH&nbsp;RE(ID,PID)&nbsp;AS&nbsp;(
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;ID,PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;ID=?
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;TABLE1.ID,TABLE1.PID&nbsp;FROM&nbsp;RE,TABLE1&nbsp;WHERE&nbsp;RE.PID=TABLE1.ID
+)
+SELECT&nbsp;*&nbsp;FROM&nbsp;RE</pre><p><strong>坑：</strong>(DB2中的测试，其他数据库未知)</p><p>在 WITH AS 中不可将 RE 用于嵌套查询、分组、聚合函数、去重等，将会报错<strong><br/></strong></p><p>错误示例：</p><p>不可将RE嵌套</p><pre class="brush:sql;toolbar:false">WITH&nbsp;RE(ID,PID)&nbsp;AS&nbsp;(
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;ID,PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;ID=?
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;TABLE1.ID,TABLE1.PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;TABLE1.ID&nbsp;IN&nbsp;(SELECT&nbsp;RE.PID&nbsp;FROM&nbsp;RE)
+)
+SELECT&nbsp;*&nbsp;FROM&nbsp;RE</pre><p>不可使用GROUP BY</p><pre class="brush:sql;toolbar:false">WITH&nbsp;RE(ID,PID)&nbsp;AS&nbsp;(
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;ID,PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;ID=?
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;TABLE1.ID,TABLE1.PID&nbsp;FROM&nbsp;RE,TABLE1&nbsp;WHERE&nbsp;RE.PID=TABLE1.ID
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;RE.ID,RE.PID&nbsp;FROM&nbsp;RE&nbsp;GROUP&nbsp;BY&nbsp;RE.ID,RE.PID
+)
+SELECT&nbsp;*&nbsp;FROM&nbsp;RE</pre><p>不可使用聚合函数</p><pre class="brush:sql;toolbar:false">WITH&nbsp;RE(ID,PID)&nbsp;AS&nbsp;(
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;ID,PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;ID=?
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;TABLE1.ID,TABLE1.PID&nbsp;FROM&nbsp;RE,TABLE1&nbsp;WHERE&nbsp;RE.PID=TABLE1.ID
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;MAX(RE.ID),MAX(RE.PID)&nbsp;FROM&nbsp;RE
+)
+SELECT&nbsp;*&nbsp;FROM&nbsp;RE</pre><p>不可使用 DISTINCT 去重</p><pre class="brush:sql;toolbar:false">WITH&nbsp;RE(ID,PID)&nbsp;AS&nbsp;(
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;ID,PID&nbsp;FROM&nbsp;TABLE1&nbsp;WHERE&nbsp;ID=?
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;TABLE1.ID,TABLE1.PID&nbsp;FROM&nbsp;RE,TABLE1&nbsp;WHERE&nbsp;RE.PID=TABLE1.ID
+&nbsp;&nbsp;&nbsp;&nbsp;UNION&nbsp;ALL
+&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;DISTINCT&nbsp;RE.ID,RE.PID&nbsp;FROM&nbsp;RE
+)
+SELECT&nbsp;*&nbsp;FROM&nbsp;RE</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>
