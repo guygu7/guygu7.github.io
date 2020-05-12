@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>spring MVC url自动映射到方法名</strong><br/></p><p>&nbsp; &nbsp; 本文不是springMVC的自有功能，而是一种实现技巧。因为springMVC并没有自动映射URL到方法名的功能，@RequestMapping不传参不报错，但也不生效，所有只能用其他方法来实现功能。一种方法是继承重写RequestMappingHandlerMapping类，然后配置文件中使用重写的类。这种方法这里暂时省略。</p><p>&nbsp; &nbsp; 另一种方法：将需要调用的方法名以请求参数方式提交传递。本例仅提供大致思路，尚有许多不足之处，还需根据实际需要对传参和返回进行修改。</p><p>com.xxx.controller.MasterController.java<br/></p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.lang.reflect.InvocationTargetException;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.utils.SpringUtils;
+@Controller
+public&nbsp;class&nbsp;MasterController{
+	@RequestMapping(&quot;*&quot;)
+	public&nbsp;String&nbsp;MasterController(String&nbsp;clazz,String&nbsp;method,String&nbsp;qualifiedClassMethodName,Object&nbsp;pram)&nbsp;throws&nbsp;IllegalAccessException,&nbsp;IllegalArgumentException,&nbsp;InvocationTargetException,&nbsp;NoSuchMethodException,&nbsp;SecurityException{
+		System.out.println(&quot;总控制器被执行了&quot;);
+		//根据传入的类名方法名，通过工具类获得并调用方法
+		Object&nbsp;obj&nbsp;=&nbsp;SpringUtils.getBean(clazz);
+		//pram为该方法执行时真正需要传入的参数，比如用户名、密码等
+		obj.getClass().getMethod(method,Object.class).invoke(obj,pram);
+		return&nbsp;&quot;hello.jsp&quot;;
+	}
+}</pre><p>用于获取被spring管理bean的重要工具类</p><p>com.xxx.utils.SpringUtils.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.utils;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.beans.BeansException;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.ApplicationContextAware;
+import&nbsp;org.springframework.stereotype.Component;
+/**
+&nbsp;*&nbsp;Spring&nbsp;ApplicationContext&nbsp;工具类
+*/
+@SuppressWarnings(&quot;unchecked&quot;)
+@Component
+public&nbsp;class&nbsp;SpringUtils&nbsp;implements&nbsp;ApplicationContextAware&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;static&nbsp;ApplicationContext&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;setApplicationContext(ApplicationContext&nbsp;applicationContext)&nbsp;throws&nbsp;BeansException&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SpringUtils.applicationContext&nbsp;=&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;T&nbsp;getBean(String&nbsp;beanName)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(applicationContext.containsBean(beanName)){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;(T)&nbsp;applicationContext.getBean(beanName);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;null;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;Map&lt;String,&nbsp;T&gt;&nbsp;getBeansOfType(Class&lt;T&gt;&nbsp;baseType){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;applicationContext.getBeansOfType(baseType);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>具体被执行的类</p><p>com.xxx.action.action.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.action;
+import&nbsp;org.springframework.stereotype.Component;
+@Component
+public&nbsp;class&nbsp;action&nbsp;{
+	public&nbsp;void&nbsp;actionMethod(Object&nbsp;pram)&nbsp;{
+		System.out.println(&quot;action被执行&quot;);
+	}
+}</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

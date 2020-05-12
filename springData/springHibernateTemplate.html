@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h3><strong>Spring Data HibernateTemplate 非注解声明式XML配置</strong></h3><p>一、配置文件</p><p style="white-space: normal;">注意点：</p><p style="white-space: normal;">1. &lt;tx:advice&gt; 依赖aspectj，需要添加jar包，本例使用的是com.springsource.org.aspectj.weaver.jar。另外说明：tx:advice才需要依赖，&lt;aop:&gt;本身不需要依赖。</p><p style="white-space: normal;">2. 本示例为简化配置说明，直接使用Controller类做测试，没有使用连接池及properties文件。</p><p style="white-space: normal;">配置：</p><p style="white-space: normal;">HibernateTemplate的主要配置在springmvc.xml中，固web.xml在此省略。</p><p>springmvc.xml<strong><br/></strong></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context/spring-context-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&quot;&gt;
+	&lt;!--&nbsp;启用注解驱动，会自动配置&nbsp;&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping&quot;&gt;&nbsp;
+		&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter&quot;&gt;&nbsp;--&gt;
+	&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+	&lt;!--&nbsp;扫描spring的IOC注解：设置哪些包下的文件进行扫描&nbsp;--&gt;
+	&lt;context:component-scan&nbsp;base-package=&quot;com.xxx.*&quot;&gt;&lt;/context:component-scan&gt;
+
+	&lt;!--&nbsp;Data数据源配置&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;dataSource&quot;&nbsp;class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+		&lt;property&nbsp;name=&quot;driverClassName&quot;&nbsp;value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;url&quot;&nbsp;value=&quot;jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;username&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;password&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+	
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;传播行为&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:advice&nbsp;id=&quot;txAdvice&quot;&nbsp;transaction-manager=&quot;hibernateTransactionManager&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;		&lt;!--&nbsp;通知（详细参数配置见下表）&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:method&nbsp;name=&quot;*&quot;&nbsp;propagation=&quot;REQUIRED&quot;&nbsp;read-only=&quot;false&quot;&nbsp;rollback-for=&quot;java.lang.Exception&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:advice&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;切面配置哪些方法开启事务&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:advisor&nbsp;advice-ref=&quot;txAdvice&quot;&nbsp;pointcut=&quot;execution(*&nbsp;com.xxx.controller.*.*(..))&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;Hibernate配置&nbsp;--&gt;
+	&lt;!--&nbsp;hibernateTemplate，依赖了sessionFactory&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateTemplate&quot;&nbsp;class=&quot;org.springframework.orm.hibernate5.HibernateTemplate&quot;&gt;
+		&lt;property&nbsp;name=&quot;sessionFactory&quot;&nbsp;ref=&quot;hibernateSessionFactory&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+	&lt;!--&nbsp;配置&nbsp;sessionFactory，依赖dataSource数据源&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateSessionFactory&quot;&nbsp;class=&quot;org.springframework.orm.hibernate5.LocalSessionFactoryBean&quot;&gt;
+		&lt;!--&nbsp;数据源&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;dataSource&quot;&nbsp;ref=&quot;dataSource&quot;&nbsp;/&gt;
+		&lt;!--&nbsp;hibernateProperties&nbsp;属性：配置与&nbsp;hibernate&nbsp;相关的内容，如显示&nbsp;sql&nbsp;语句，开启正向工程&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;hibernateProperties&quot;&gt;
+			&lt;props&gt;
+				&lt;!--&nbsp;显示当前执行的&nbsp;sql&nbsp;语句&nbsp;--&gt;
+				&lt;prop&nbsp;key=&quot;hibernate.show_sql&quot;&gt;true&lt;/prop&gt;
+				&lt;!--&nbsp;开启正向工程&nbsp;&lt;prop&nbsp;key=&quot;hibernate.hbm2ddl.auto&quot;&gt;update&lt;/prop&gt;&nbsp;--&gt;
+			&lt;/props&gt;
+		&lt;/property&gt;
+
+		&lt;!--&nbsp;非注解，声明式&nbsp;--&gt;
+		&lt;!--&nbsp;加载匹配的.hbm.xml映射文件&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;mappingLocations&quot;&gt;
+			&lt;value&gt;classpath:com/xxx/bean/**/*.hbm.xml&lt;/value&gt;
+		&lt;/property&gt;
+		&lt;!--&nbsp;加载对应目录下的.hbm.xml映射文件&nbsp;
+		&lt;property&nbsp;name=&quot;mappingDirectoryLocations&quot;&gt;&nbsp;
+			&lt;value&gt;classpath:com/xxx/bean/*&lt;/value&gt;&nbsp;
+		&lt;/property&gt;&nbsp;--&gt;
+
+	&lt;/bean&gt;
+
+	&lt;!--&nbsp;配置&nbsp;Hibernate&nbsp;的事务管理器&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateTransactionManager&quot;
+		class=&quot;org.springframework.orm.hibernate5.HibernateTransactionManager&quot;&gt;
+		&lt;property&nbsp;name=&quot;sessionFactory&quot;&nbsp;ref=&quot;hibernateSessionFactory&quot;&nbsp;/&gt;
+	&lt;/bean&gt;
+	
+&lt;/beans&gt;</pre><p>&lt;tx:method&gt;详细参数表<br/></p><table><tbody><tr class="ue-table-interlace-color-single firstRow"><td width="140" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">name</td><td width="285" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">例：inster* ins* update* save*等</td><td width="542" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">该标签对应的方法</td></tr><tr class="ue-table-interlace-color-double"><td width="118" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);" rowspan="2" colspan="1">read-only</td><td width="285" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">true<br/></td><td width="542" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">只读事务<br/></td></tr><tr class="ue-table-interlace-color-single"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">false（默认值）</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">非只读事务，需要提交，增删改必须为此</td></tr><tr class="ue-table-interlace-color-double"><td width="140" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);" rowspan="7" colspan="1">propagation</td><td width="271" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">REQUIRED (默认值)</td><td width="542" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">有事务当前事务执行，没有事务则开启事务</td></tr><tr class="ue-table-interlace-color-single"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">SUPPORTS</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">有事务当前事务执行，没有事务则非事务状态执行</td></tr><tr class="ue-table-interlace-color-double"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">MANDATORY</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">有事务当前事务执行，没有事务则抛异常</td></tr><tr class="ue-table-interlace-color-single"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">NEVER</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(170, 170, 170);">有事务则抛异常</td></tr><tr class="ue-table-interlace-color-double"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">REQUIRES_NEW</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(187, 187, 187);">新建事务执行，如有事务当前事务挂起</td></tr><tr class="ue-table-interlace-color-single"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">NOT_SUPPORTED</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">在非事务状态执行，如有事务当前事务挂起</td></tr><tr class="ue-table-interlace-color-double"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="141">NESTED</td><td valign="top" colspan="1" rowspan="1" width="356" style="word-break: break-all; background-color: rgb(170, 170, 170);">新建事务执行，如有事务则嵌套事务</td></tr><tr class="ue-table-interlace-color-single"><td valign="top" colspan="1" rowspan="5" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="140">isolation</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="271">DEFAULT(默认值)</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="542">数据库自动判断</td></tr><tr class="ue-table-interlace-color-double"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(204, 204, 204);" width="141">READ_UNCOMMITTED</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(204, 204, 204);" width="356">读未提交</td></tr><tr class="ue-table-interlace-color-single"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="141">READ_COMMITTED</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="356">读已提交</td></tr><tr class="ue-table-interlace-color-double"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="141">REPEATABLE_READ</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="356">对读取数据添加锁</td></tr><tr class="ue-table-interlace-color-single"><td width="141" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">SERIALIZABLE</td><td width="356" valign="top" style="word-break: break-all; background-color: rgb(204, 204, 204);">对读取表添加锁</td></tr><tr class="ue-table-interlace-color-double"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="140">rollback-for</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="277">java.lang.Exception (默认值)</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(170, 170, 170);" width="542">抛出异常时回滚（不显示配置某些情况可能不回滚，建议显示设置）</td></tr><tr class="ue-table-interlace-color-single"><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="140">no-rollback-for</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="277">自定义异常类</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all; background-color: rgb(187, 187, 187);" width="542">抛出某异常时不回滚</td></tr></tbody></table><p>com.xxx.bean.Table1.hbm.xml</p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;&nbsp;standalone=&quot;no&quot;?&gt;
+&lt;!--&nbsp;Generated&nbsp;2020-4-2&nbsp;13:43:11&nbsp;by&nbsp;Hibernate&nbsp;Tools&nbsp;5.4.2.Final&nbsp;--&gt;&lt;!DOCTYPE&nbsp;hibernate-mapping&nbsp;PUBLIC&nbsp;&quot;-//Hibernate/Hibernate&nbsp;Mapping&nbsp;DTD&nbsp;3.0//EN&quot;&nbsp;&quot;http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd&quot;&gt;
+&lt;hibernate-mapping&nbsp;auto-import=&quot;true&quot;&nbsp;default-access=&quot;property&quot;&nbsp;default-cascade=&quot;none&quot;&nbsp;default-lazy=&quot;true&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;class&nbsp;catalog=&quot;testdb&quot;&nbsp;dynamic-insert=&quot;false&quot;&nbsp;dynamic-update=&quot;false&quot;&nbsp;mutable=&quot;true&quot;&nbsp;name=&quot;com.xxx.bean.Table1&quot;&nbsp;optimistic-lock=&quot;version&quot;&nbsp;polymorphism=&quot;implicit&quot;&nbsp;select-before-update=&quot;false&quot;&nbsp;table=&quot;table1&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;id&nbsp;name=&quot;tb1Id&quot;&nbsp;type=&quot;string&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;column&nbsp;name=&quot;tb1_id_&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;generator&nbsp;class=&quot;assigned&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/id&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;generated=&quot;never&quot;&nbsp;lazy=&quot;false&quot;&nbsp;name=&quot;field1&quot;&nbsp;optimistic-lock=&quot;true&quot;&nbsp;type=&quot;string&quot;&nbsp;unique=&quot;false&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;column&nbsp;length=&quot;10&quot;&nbsp;name=&quot;field1&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;generated=&quot;never&quot;&nbsp;lazy=&quot;false&quot;&nbsp;name=&quot;field2&quot;&nbsp;optimistic-lock=&quot;true&quot;&nbsp;type=&quot;string&quot;&nbsp;unique=&quot;false&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;column&nbsp;name=&quot;field2&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/class&gt;
+&lt;/hibernate-mapping&gt;</pre><p>com.xxx.bean.Table1.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.bean;
+public&nbsp;class&nbsp;Table1&nbsp;implements&nbsp;java.io.Serializable&nbsp;{
+	private&nbsp;String&nbsp;tb1Id;
+	private&nbsp;String&nbsp;field1;
+	private&nbsp;String&nbsp;field2;
+	public&nbsp;Table1()&nbsp;{}
+	public&nbsp;Table1(String&nbsp;tb1Id)&nbsp;{
+		this.tb1Id&nbsp;=&nbsp;tb1Id;
+	}
+	public&nbsp;Table1(String&nbsp;tb1Id,&nbsp;String&nbsp;field1,&nbsp;String&nbsp;field2)&nbsp;{
+		this.tb1Id&nbsp;=&nbsp;tb1Id;
+		this.field1&nbsp;=&nbsp;field1;
+		this.field2&nbsp;=&nbsp;field2;
+	}
+	public&nbsp;String&nbsp;getTb1Id()&nbsp;{
+		return&nbsp;this.tb1Id;
+	}
+	public&nbsp;void&nbsp;setTb1Id(String&nbsp;tb1Id)&nbsp;{
+		this.tb1Id&nbsp;=&nbsp;tb1Id;
+	}
+	public&nbsp;String&nbsp;getField1()&nbsp;{
+		return&nbsp;this.field1;
+	}
+	public&nbsp;void&nbsp;setField1(String&nbsp;field1)&nbsp;{
+		this.field1&nbsp;=&nbsp;field1;
+	}
+	public&nbsp;String&nbsp;getField2()&nbsp;{
+		return&nbsp;this.field2;
+	}
+	public&nbsp;void&nbsp;setField2(String&nbsp;field2)&nbsp;{
+		this.field2&nbsp;=&nbsp;field2;
+	}
+}</pre><p>二、三种获取使用HibernateTemplate的方法：</p><p>1、直接使用自动注入</p><p>com.xxx.controller.ControllerTest.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.List;
+import&nbsp;org.springframework.beans.factory.annotation.Autowired;
+import&nbsp;org.springframework.orm.hibernate5.HibernateTemplate;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.bean.Table1;
+@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;{
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+	@SuppressWarnings({&nbsp;&quot;deprecation&quot;,&nbsp;&quot;unchecked&quot;&nbsp;})
+	@RequestMapping(&quot;/hibernateTemplate&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample(){
+		//使用hibernateTemplate执行各种操作
+		List&lt;Table1&gt;&nbsp;tbls&nbsp;=&nbsp;(List&lt;Table1&gt;)&nbsp;hibernateTemplate.find(&quot;from&nbsp;Table1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	Table1&nbsp;tb1&nbsp;=&nbsp;tbls.get(0);
+&nbsp;&nbsp;&nbsp;&nbsp;	tb1.setField1(&quot;3&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.save(tb1);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.flush();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>2、通过ApplicationContext获取托管到spring的bean，这里使用自定义工具类</p><p>com.xxx.controller.ControllerTest2.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.List;
+import&nbsp;org.springframework.orm.hibernate5.HibernateTemplate;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.bean.Table1;
+import&nbsp;com.xxx.utils.SpringUtils;
+@Controller
+public&nbsp;class&nbsp;ControllerTest2&nbsp;{
+	@SuppressWarnings({&nbsp;&quot;unchecked&quot;,&nbsp;&quot;deprecation&quot;&nbsp;})
+	@RequestMapping(&quot;/hibernateTemplate2&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample(){
+		//获取到托管到Spring中的hibernateTemplate
+&nbsp;&nbsp;&nbsp;&nbsp;	HibernateTemplate&nbsp;hibernateTemplate&nbsp;=&nbsp;SpringUtils.getBean(&quot;hibernateTemplate&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	//使用hibernateTemplate执行各种操作
+		List&lt;Table1&gt;&nbsp;tbls&nbsp;=&nbsp;(List&lt;Table1&gt;)&nbsp;hibernateTemplate.find(&quot;from&nbsp;Table1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	Table1&nbsp;tb1&nbsp;=&nbsp;tbls.get(0);
+&nbsp;&nbsp;&nbsp;&nbsp;	tb1.setField1(&quot;2&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.save(tb1);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.flush();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>工具类：com.xxx.utils.SpringUtils.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.utils;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.beans.BeansException;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.ApplicationContextAware;
+import&nbsp;org.springframework.stereotype.Component;
+/**
+&nbsp;*&nbsp;Spring&nbsp;ApplicationContext&nbsp;工具类
+*/
+@SuppressWarnings(&quot;unchecked&quot;)
+@Component
+public&nbsp;class&nbsp;SpringUtils&nbsp;implements&nbsp;ApplicationContextAware&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;static&nbsp;ApplicationContext&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;setApplicationContext(ApplicationContext&nbsp;applicationContext)&nbsp;throws&nbsp;BeansException&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SpringUtils.applicationContext&nbsp;=&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;ApplicationContext&nbsp;getApplicationContext(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;T&nbsp;getBean(String&nbsp;beanName)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(applicationContext.containsBean(beanName)){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;(T)&nbsp;applicationContext.getBean(beanName);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;null;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;Map&lt;String,&nbsp;T&gt;&nbsp;getBeansOfType(Class&lt;T&gt;&nbsp;baseType){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;applicationContext.getBeansOfType(baseType);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>3、通过HibernateDaoSupport获取，HibernateDaoSupport不仅可以获取HibernateTemplate也封装了许多其他功能，网上大多数方法都是在DAO层继承这个，这里为了简便直接用测试类继承</p><p>com.xxx.controller.ControllerTest3.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.List;
+import&nbsp;org.springframework.orm.hibernate5.HibernateTemplate;
+import&nbsp;org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.bean.Table1;
+@Controller
+public&nbsp;class&nbsp;ControllerTest3&nbsp;extends&nbsp;HibernateDaoSupport&nbsp;{
+	@SuppressWarnings({&nbsp;&quot;unchecked&quot;,&nbsp;&quot;deprecation&quot;&nbsp;})
+	@RequestMapping(&quot;/hibernateTemplate3&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample(){
+		//获取hibernateTemplate
+		HibernateTemplate&nbsp;hibernateTemplate&nbsp;=&nbsp;this.getHibernateTemplate();
+		//使用hibernateTemplate执行各种操作
+		List&lt;Table1&gt;&nbsp;tbls&nbsp;=&nbsp;(List&lt;Table1&gt;)&nbsp;hibernateTemplate.find(&quot;from&nbsp;Table1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	Table1&nbsp;tb1&nbsp;=&nbsp;tbls.get(0);
+&nbsp;&nbsp;&nbsp;&nbsp;	tb1.setField1(&quot;2&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.save(tb1);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.flush();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: large; background-color: rgb(255, 255, 255);"></span><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

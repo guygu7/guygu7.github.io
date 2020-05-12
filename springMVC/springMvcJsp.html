@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>springMVC对JSP页面的作用域传值</strong></p><p>仅jsp有效，无法通过此方法对html传值，纯html+js需要用返回json的方式<strong><br/></strong></p><p>com.xxx.controller.ControllerExample2</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.Map;
+import&nbsp;javax.servlet.http.HttpServletRequest;
+import&nbsp;javax.servlet.http.HttpServletResponse;
+import&nbsp;javax.servlet.http.HttpSession;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;org.springframework.web.servlet.ModelAndView;
+@Controller
+public&nbsp;class&nbsp;ControllerExample2&nbsp;{
+	
+	/**
+	&nbsp;*&nbsp;可以直接接收到的Servlet参数，参数名随意且无需前端页面显示定义，其他的暂未测试
+	&nbsp;*&nbsp;@param&nbsp;httpServletRequest
+	&nbsp;*&nbsp;@param&nbsp;httpServletResponse
+	&nbsp;*&nbsp;@param&nbsp;httpSession
+	&nbsp;*&nbsp;@param&nbsp;printWriter
+	&nbsp;*/
+	@RequestMapping(&quot;/ControllerExample2/methodExample&quot;)
+	public&nbsp;String&nbsp;methodExample(
+			HttpServletRequest&nbsp;httpServletRequest,
+			HttpServletResponse&nbsp;httpServletResponse,
+			HttpSession&nbsp;httpSession
+			//,PrintWriter&nbsp;printWriter//在使用PrintWriter同时使用return会抛异常
+			){
+		httpServletRequest.setAttribute(&quot;returnPram&quot;,&nbsp;&quot;value&quot;);
+		httpSession.setAttribute(&quot;returnPram&quot;,&nbsp;&quot;value&quot;);
+		return&nbsp;&quot;/index.jsp&quot;;
+	}
+	
+	/**
+	&nbsp;*&nbsp;springMVC默认会接收一个Map，并将该Map存入requestScope中
+	&nbsp;*&nbsp;@param&nbsp;mapExample
+	&nbsp;*/
+	@RequestMapping(&quot;/ControllerExample2/methodExample2&quot;)
+	public&nbsp;String&nbsp;methodExample2(Map&lt;String,Object&gt;&nbsp;mapExample){
+		mapExample.put(&quot;map-key&quot;,&nbsp;&quot;value&quot;);
+		return&nbsp;&quot;/index.jsp&quot;;
+	}
+	
+	/**
+	&nbsp;*&nbsp;springMVC默认会接收一个ModelAndView，存入其中的值可以在requestScope中获得
+	&nbsp;*&nbsp;注意：本例是@RequestMapping(&quot;/ControllerExample2-methodExample3&quot;)
+	&nbsp;*&nbsp;	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;而不是@RequestMapping(&quot;/ControllerExample2/methodExample3&quot;)
+	&nbsp;*&nbsp;如果设置&quot;/ControllerExample2/methodExample3&quot;&nbsp;则&nbsp;setViewName(&quot;index.jsp&quot;)&nbsp;的最终跳转为&nbsp;&quot;/ControllerExample2/index.jsp&quot;
+	&nbsp;*/
+	@RequestMapping(&quot;/ControllerExample2-methodExample3&quot;)
+	public&nbsp;ModelAndView&nbsp;methodExample3(ModelAndView&nbsp;modelAndView){
+		//也可以不通过传入，直接实例化ModelAndView
+		//ModelAndView&nbsp;modelAndView&nbsp;=&nbsp;new&nbsp;ModelAndView(&quot;index.jsp&quot;);
+		modelAndView.addObject(&quot;modelAndView_key&quot;,&nbsp;&quot;value&quot;);
+		modelAndView.setViewName(&quot;/index.jsp&quot;);
+		return&nbsp;modelAndView;
+	}
+}</pre><p>在jsp页面中取值</p><p>index.jsp<br/></p><pre class="brush:html;toolbar:false">&lt;%@&nbsp;page&nbsp;language=&quot;java&quot;&nbsp;contentType=&quot;text/html;&nbsp;charset=UTF-8&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;pageEncoding=&quot;UTF-8&quot;%&gt;
+&lt;!DOCTYPE&nbsp;html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Insert&nbsp;title&nbsp;here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+${requestScope.returnPram}&lt;br&gt;
+${sessionScope.returnPram}&lt;br&gt;
+${requestScope.mapExample}&lt;br&gt;
+${requestScope.modelAndView_key}
+&lt;/body&gt;
+&lt;/html&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

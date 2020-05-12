@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>Spring Jdbc&nbsp;JdbcTemplate</strong><br/></p><p>在此做一个最简单的连接数据可并查询的示例：</p><p><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">配置文件：applicationContext.xml</span></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+	&lt;bean&nbsp;id=&quot;dataSource&quot;&nbsp;class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;driverClassName&quot;&nbsp;value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;url&quot;&nbsp;value=&quot;jdbc:mysql://localhost:3306/MysqlDB&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;username&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;password&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/bean&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;bean&nbsp;id=&quot;jdbcTemplate&quot;&nbsp;class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;dataSource&quot;&nbsp;ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/bean&gt;
+&lt;/beans&gt;</pre><p><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;"></span><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">运行调用文件：com.xxx.test.test.java</span></p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.test;
+import&nbsp;java.util.List;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.support.ClassPathXmlApplicationContext;
+import&nbsp;org.springframework.jdbc.core.JdbcTemplate;
+public&nbsp;class&nbsp;test&nbsp;{
+	public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)&nbsp;{
+		ApplicationContext&nbsp;ctx&nbsp;=&nbsp;new&nbsp;ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+		JdbcTemplate&nbsp;jdbcTemplate&nbsp;=&nbsp;(JdbcTemplate)&nbsp;ctx.getBean(&quot;jdbcTemplate&quot;);
+		List&lt;Map&lt;String,&nbsp;Object&gt;&gt;&nbsp;ls&nbsp;=&nbsp;jdbcTemplate.queryForList(&quot;&nbsp;SELECT&nbsp;*&nbsp;FROM&nbsp;mysqltable&nbsp;&quot;);
+		//打印查询结果
+		System.out.println(ls.toString());
+	}
+}</pre><p><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;"></span><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

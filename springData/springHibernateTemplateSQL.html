@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4>HibernateTemplate&nbsp; 执行原生SQL语句</h4><p>传入的SQL不会被加工，而是原原本本被拿去执行。</p><pre class="brush:java;toolbar:false">@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/SQL&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateSQLExample()&nbsp;throws&nbsp;Exception{
+		Session&nbsp;s&nbsp;=&nbsp;hibernateTemplate.getSessionFactory().getCurrentSession();
+		Query&lt;Table1&gt;&nbsp;query&nbsp;=&nbsp;s.createSQLQuery(&quot;select&nbsp;*&nbsp;from&nbsp;Table1&nbsp;where&nbsp;field1_=?&quot;).addEntity(Table1.class);
+		query.setParameter(1,&quot;1&quot;);
+		List&lt;Table1&gt;&nbsp;ls&nbsp;=&nbsp;query.getResultList();//执行查询
+		System.out.println(ls.toString());
+		return&nbsp;&quot;index.jsp&quot;;
+	}	
+}</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

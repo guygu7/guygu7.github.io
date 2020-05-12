@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>springMVC 拦截器&nbsp;Filter</strong></p><p>本例的设置会拦截所有经过springmvc的请求，不再展示被拦截的bean类文件</p><p>配置文件：springmvc.xml</p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+&nbsp;&nbsp;&nbsp;xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+&nbsp;&nbsp;&nbsp;xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+&nbsp;&nbsp;&nbsp;xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+	&lt;mvc:interceptors&gt;
+		&lt;bean&nbsp;class=&quot;com.xxx.filter.FilterController&quot;&gt;&lt;/bean&gt;
+	&lt;/mvc:interceptors&gt;
+	&lt;!--&nbsp;自定义拦截器，拦截指定请求&nbsp;--&gt;
+	&lt;!--&nbsp;
+	&lt;mvc:interceptors&gt;
+		&lt;mvc:interceptor&gt;
+			&lt;mvc:mapping&nbsp;path=&quot;/url1&quot;/&gt;
+			&lt;mvc:mapping&nbsp;path=&quot;/url2&quot;/&gt;
+			&lt;bean&nbsp;class=&quot;com.xxx.filter.FilterController&quot;&gt;&lt;/bean&gt;
+		&lt;/mvc:interceptor&gt;
+	&lt;/mvc:interceptors&gt;
+	&nbsp;--&gt;
+&lt;/beans&gt;</pre><p>自定义的拦截器类，需实现HandlerInterceptor接口</p><p>com.xxx.filter.FilterController</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.filter;
+import&nbsp;javax.servlet.http.HttpServletRequest;
+import&nbsp;javax.servlet.http.HttpServletResponse;
+import&nbsp;org.springframework.web.servlet.HandlerInterceptor;
+import&nbsp;org.springframework.web.servlet.ModelAndView;
+public&nbsp;class&nbsp;FilterController&nbsp;implements&nbsp;HandlerInterceptor{
+	/**
+	&nbsp;*&nbsp;在进入控制器之前执行
+	&nbsp;*&nbsp;第3参数&nbsp;Object&nbsp;handler为调用的控制器handler的具体方法
+	&nbsp;*&nbsp;如果return&nbsp;false,阻止进入控制器
+	&nbsp;*/
+	public&nbsp;boolean&nbsp;preHandle(HttpServletRequest&nbsp;request,&nbsp;HttpServletResponse&nbsp;response,&nbsp;Object&nbsp;handler)
+			throws&nbsp;Exception&nbsp;{
+		System.out.println(&quot;do&nbsp;some&nbsp;thing&quot;);
+		return&nbsp;true;
+	}
+	
+	/**
+	&nbsp;*&nbsp;控制器执行后，进入到jsp之前执行
+	&nbsp;*&nbsp;第3参数&nbsp;Object&nbsp;handler为调用的控制器handler的具体方法
+	&nbsp;*&nbsp;&nbsp;第4参数为springMVC的ModelAndView
+	&nbsp;*/
+	public&nbsp;void&nbsp;postHandle(HttpServletRequest&nbsp;request,&nbsp;HttpServletResponse&nbsp;response,&nbsp;Object&nbsp;handler,&nbsp;ModelAndView&nbsp;mv)
+			throws&nbsp;Exception&nbsp;{
+		System.out.println(&quot;do&nbsp;some&nbsp;thing&quot;);
+	}
+	
+	/**
+	&nbsp;*&nbsp;jsp执行完成后执行
+	&nbsp;*&nbsp;记录执行过程中出现的异常
+	&nbsp;*&nbsp;第3参数&nbsp;Object&nbsp;handler为调用的控制器handler的具体方法
+	&nbsp;*&nbsp;第4参数&nbsp;Exception&nbsp;ex为控制器handler抛出的异常
+	&nbsp;*/
+	public&nbsp;void&nbsp;afterCompletion(HttpServletRequest&nbsp;request,&nbsp;HttpServletResponse&nbsp;response,&nbsp;Object&nbsp;handler,&nbsp;Exception&nbsp;ex)
+			throws&nbsp;Exception&nbsp;{
+		System.out.println(&quot;do&nbsp;some&nbsp;thing&quot;);
+	}
+}</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

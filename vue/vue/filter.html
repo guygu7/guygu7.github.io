@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="stylesheet" href="../../base.css">
     <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
-    <title>static-site</title>
+    <title>私人资料站</title>
   </head>
   <body style="background:transparent;">
 <h4>filter 全局过滤器 和 局部（私有）过滤器</h4><p>全局过滤器定义位置在 main.js 中<br/></p><p>如果全局过滤器和私有(局部)过滤器同名，则仅会经过和触发私有(局部)过滤器，不会经过和触发全局过滤器</p><p>局部过滤器仅在当前组件中有效，在父子组件中相互都无效</p><p>使用多个过滤器会从左向右顺序触发</p><p>基于vue-cli的示例：</p><p>main.js<br/></p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;

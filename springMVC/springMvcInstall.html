@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px; white-space: normal;">Spring MVC 的基本配置</strong></p><p><span style="color:#333333;font-family:Helvetica Neue, Helvetica, Arial, sans-serif"><span style="font-size: 14px;">主要需要手动配置加载DispatcherServlet，springMVC才会生效。<span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">本例为tomcat的配置web.xml</span></span></span></p><p>web.xml</p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;web-app&nbsp;xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&nbsp;xmlns=&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;&nbsp;xsi:schemaLocation=&quot;http://xmlns.jcp.org/xml/ns/javaee&nbsp;http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;&nbsp;id=&quot;WebApp_ID&quot;&nbsp;version=&quot;4.0&quot;&gt;
+&nbsp;&nbsp;&lt;servlet&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;servlet-name&gt;springmvcExample&lt;/servlet-name&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;前端控制器&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;servlet-class&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;org.springframework.web.servlet.DispatcherServlet
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/servlet-class&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;修改配置文件路径和名称,缺省配置为读取/WEB-INF/下的该&quot;servlet-name&quot;+&quot;-servlet.xml&quot;文件,&nbsp;本例为&nbsp;&nbsp;springmvcExample-servlet.xml&nbsp;--&gt;
+	&lt;init-param&gt;
+		&lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+		&lt;!--&nbsp;表示读取src文件夹下路径文件&nbsp;--&gt;
+		&lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt;
+	&lt;/init-param&gt;
+	&lt;!--&nbsp;自启动，随tomcat启动自动实例化&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+&nbsp;&nbsp;&lt;/servlet&gt;
+&nbsp;&nbsp;&lt;!--&nbsp;配置URL映射，设置哪些URL的请求会进入springweb的DispatcherServlet&nbsp;--&gt;
+&nbsp;&nbsp;&lt;servlet-mapping&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;servlet-name&gt;springmvcExample&lt;/servlet-name&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;配置&quot;/&quot;代表除.jsp文件以外的请求都会进入&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;url-pattern&gt;/&lt;/url-pattern&gt;
+&nbsp;&nbsp;&lt;/servlet-mapping&gt;
+&lt;/web-app&gt;</pre><p>接下来为springmvc的配置文件，文件名和所在路径与web.xml中设定的一致，本例该文件在src文件夹下。本例仅展示以注解方式使用springMVC的配置。</p><p>包含内容：1、注解驱动 及 扫描注解文件/包 的配置</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2、静态资源的映射（由springMVC管理的）</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3、自定义视图解析器（即转发/跳转是自动增加url前后缀）<br/></p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4、自定义拦截器<br/></p><p>src/springmvc.xml<br/></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+&nbsp;&nbsp;&nbsp;xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+&nbsp;&nbsp;&nbsp;xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+&nbsp;&nbsp;&nbsp;xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+&nbsp;&nbsp;&nbsp;xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context/spring-context-3.0.xsd&quot;&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;启用注解驱动，会自动配置
+&nbsp;	&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping&quot;&gt;
+	&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter&quot;&gt;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;扫描spring的注解：设置哪些包下的文件进行扫描&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;context:component-scan&nbsp;base-package=&quot;com.xxx.*&quot;&nbsp;&gt;&lt;/context:component-scan&gt;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;静态资源映射：mapping为配置的URL，location为映射的WebContent文件夹下物理地址&nbsp;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;1.映射WebContent文件夹下的资源配置，
+&nbsp;&nbsp;&nbsp;	注意：直接使用根路径&quot;/&quot;的配置无法访问WEB-INF和META-INF文件夹下的内容，且可能会使后面使用&quot;/WEB-INF/&quot;路径的配置失效&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;&lt;mvc:resources&nbsp;location=&quot;/&quot;&nbsp;mapping=&quot;/static/**&quot;&gt;&lt;/mvc:resources&gt;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;mvc:resources&nbsp;location=&quot;/static/&quot;&nbsp;mapping=&quot;/static/**&quot;&gt;&lt;/mvc:resources&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;2.映射WebContent/WEB-INF文件夹下的资源配置&nbsp;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;&lt;mvc:resources&nbsp;location=&quot;/WEB-INF/&quot;&nbsp;mapping=&quot;/static/**&quot;&gt;&lt;/mvc:resources&gt;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;自定义视图解析器，配置后会在return返回值上自动增加前缀后缀。可缺省，缺省为默认视图解析器&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;
+&nbsp;&nbsp;&nbsp;&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;prefix&quot;&nbsp;value=&quot;/&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;	&lt;property&nbsp;name=&quot;suffix&quot;&nbsp;value=&quot;&quot;&gt;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&lt;/bean&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;自定义拦截器，拦截所有请求&nbsp;--&gt;
+	&lt;mvc:interceptors&gt;
+		&lt;bean&nbsp;class=&quot;com.xxx.filter.FilterController&quot;&gt;&lt;/bean&gt;
+	&lt;/mvc:interceptors&gt;
+	&lt;!--&nbsp;自定义拦截器，拦截指定请求&nbsp;--&gt;
+	&lt;!--&nbsp;
+	&lt;mvc:interceptors&gt;
+		&lt;mvc:interceptor&gt;
+			&lt;mvc:mapping&nbsp;path=&quot;/url1&quot;/&gt;
+			&lt;mvc:mapping&nbsp;path=&quot;/url2&quot;/&gt;
+			&lt;bean&nbsp;class=&quot;com.xxx.filter.FilterController&quot;&gt;&lt;/bean&gt;
+		&lt;/mvc:interceptor&gt;
+	&lt;/mvc:interceptors&gt;
+	&nbsp;--&gt;
+&lt;/beans&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

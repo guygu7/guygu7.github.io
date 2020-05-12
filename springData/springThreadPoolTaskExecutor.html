@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4>Spring的线程池 ThreadPoolTaskExecutor</h4><p>spring使用多线程时，根据情况，可能会出现事务及回滚操作失效、会话被关闭等情况，本例展示新线程使用HibernateTemplate开启新会话事务的简单示例。</p><p>springmvc.xml</p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context/spring-context-4.3.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&quot;&gt;
+	&lt;!--&nbsp;启用注解驱动，会自动配置&nbsp;&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping&quot;&gt;&nbsp;
+		&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter&quot;&gt;&nbsp;--&gt;
+	&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+	&lt;!--&nbsp;扫描spring的IOC注解：设置哪些包下的文件进行扫描&nbsp;--&gt;
+	&lt;context:component-scan&nbsp;base-package=&quot;com.xxx.*&quot;&gt;&lt;/context:component-scan&gt;
+
+	&lt;!--&nbsp;Data数据源配置&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;dataSource&quot;&nbsp;class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+		&lt;property&nbsp;name=&quot;driverClassName&quot;&nbsp;value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;url&quot;&nbsp;value=&quot;jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;username&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;password&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+	
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;传播行为&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:advice&nbsp;id=&quot;txAdvice&quot;&nbsp;transaction-manager=&quot;hibernateTransactionManager&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;		&lt;!--&nbsp;通知（哪些方法开启哪种事务）&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:method&nbsp;name=&quot;*&quot;&nbsp;propagation=&quot;REQUIRED&quot;&nbsp;read-only=&quot;false&quot;&nbsp;rollback-for=&quot;java.lang.Exception&quot;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:advice&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;切面配置哪些方法开启事务&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:advisor&nbsp;advice-ref=&quot;txAdvice&quot;&nbsp;pointcut=&quot;execution(*&nbsp;com.xxx.controller.*.*(..))&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:aspectj-autoproxy&nbsp;&nbsp;proxy-target-class=&quot;true&quot;/&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;Hibernate配置&nbsp;--&gt;
+	&lt;!--&nbsp;hibernateTemplate，依赖了sessionFactory&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateTemplate&quot;&nbsp;class=&quot;org.springframework.orm.hibernate5.HibernateTemplate&quot;&gt;
+		&lt;property&nbsp;name=&quot;sessionFactory&quot;&nbsp;ref=&quot;hibernateSessionFactory&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+	&lt;!--&nbsp;配置&nbsp;sessionFactory，依赖dataSource数据源&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateSessionFactory&quot;&nbsp;class=&quot;org.springframework.orm.hibernate5.LocalSessionFactoryBean&quot;&gt;
+		&lt;!--&nbsp;数据源&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;dataSource&quot;&nbsp;ref=&quot;dataSource&quot;&nbsp;/&gt;
+		&lt;!--&nbsp;hibernateProperties&nbsp;属性：配置与&nbsp;hibernate&nbsp;相关的内容，如显示&nbsp;sql&nbsp;语句，开启正向工程&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;hibernateProperties&quot;&gt;
+			&lt;props&gt;
+				&lt;!--&nbsp;显示当前执行的&nbsp;sql&nbsp;语句&nbsp;--&gt;
+				&lt;prop&nbsp;key=&quot;hibernate.show_sql&quot;&gt;true&lt;/prop&gt;
+				&lt;!--&nbsp;开启正向工程&nbsp;&lt;prop&nbsp;key=&quot;hibernate.hbm2ddl.auto&quot;&gt;update&lt;/prop&gt;&nbsp;--&gt;
+			&lt;/props&gt;
+		&lt;/property&gt;
+
+		&lt;!--&nbsp;非注解&nbsp;--&gt;
+		&lt;!--&nbsp;加载匹配的.hbm.xml映射文件&nbsp;--&gt;
+		&lt;property&nbsp;name=&quot;mappingLocations&quot;&gt;
+			&lt;value&gt;classpath:com/xxx/bean/**/*.hbm.xml&lt;/value&gt;
+		&lt;/property&gt;
+		&lt;!--&nbsp;加载对应目录下的.hbm.xml映射文件&nbsp;
+		&lt;property&nbsp;name=&quot;mappingDirectoryLocations&quot;&gt;&nbsp;
+			&lt;value&gt;classpath:com/xxx/bean/*&lt;/value&gt;&nbsp;
+		&lt;/property&gt;&nbsp;--&gt;
+
+	&lt;/bean&gt;
+
+	&lt;!--&nbsp;配置&nbsp;Hibernate&nbsp;的事务管理器&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;hibernateTransactionManager&quot;
+		class=&quot;org.springframework.orm.hibernate5.HibernateTransactionManager&quot;&gt;
+		&lt;property&nbsp;name=&quot;sessionFactory&quot;&nbsp;ref=&quot;hibernateSessionFactory&quot;&nbsp;/&gt;
+	&lt;/bean&gt;
+	
+	&lt;!--&nbsp;spring&nbsp;线程池&nbsp;thread&nbsp;pool&nbsp;executor&nbsp;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;bean&nbsp;id=&quot;threadPoolTaskExecutor&quot;&nbsp;class=&quot;org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;线程池维护线程的最少数量&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;corePoolSize&quot;&nbsp;value=&quot;5&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;允许的空闲时间&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;keepAliveSeconds&quot;&nbsp;value=&quot;200&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;线程池维护线程的最大数量&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;maxPoolSize&quot;&nbsp;value=&quot;10&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;缓存队列&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;queueCapacity&quot;&nbsp;value=&quot;20&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;对拒绝task的处理策略&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;rejectedExecutionHandler&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;bean&nbsp;class=&quot;java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/property&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/bean&gt;
+	
+&lt;/beans&gt;</pre><p>com.xxx.controller.ControllerTest.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;org.springframework.beans.factory.annotation.Autowired;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.comp.ComTest;
+@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;@Autowired
+	private&nbsp;ComTest&nbsp;comTest;
+	@RequestMapping(&quot;/a&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample()&nbsp;throws&nbsp;Exception{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;comTest.ComTest_Method();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>com.xxx.comp.ComTest.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.comp;
+import&nbsp;java.util.List;
+import&nbsp;org.springframework.beans.factory.annotation.Autowired;
+import&nbsp;org.springframework.orm.hibernate5.HibernateTemplate;
+import&nbsp;org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import&nbsp;org.springframework.stereotype.Component;
+import&nbsp;com.xxx.bean.Table1;
+import&nbsp;com.xxx.thread.MyThreadTest;
+@Component
+public&nbsp;class&nbsp;Com1BO&nbsp;{
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+	@Autowired
+	private&nbsp;ThreadPoolTaskExecutor&nbsp;threadPoolTaskExecutor;
+	@Autowired
+	private&nbsp;MyThreadTest&nbsp;myThreadTest;
+	@Autowired
+	private&nbsp;ThreadPoolTaskExecutor&nbsp;taskExecutor;
+	@SuppressWarnings({&nbsp;&quot;unchecked&quot;,&nbsp;&quot;deprecation&quot;&nbsp;})
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;Com1BO_Method()&nbsp;throws&nbsp;Exception{
+		//模拟主线程的程序执行，获取一些内容用于传参
+		List&lt;Table1&gt;&nbsp;tbls&nbsp;=&nbsp;(List&lt;Table1&gt;)&nbsp;hibernateTemplate.loadAll(Table1.class);
+&nbsp;&nbsp;&nbsp;&nbsp;	Table1&nbsp;tb1&nbsp;=&nbsp;tbls.get(0);
+&nbsp;&nbsp;&nbsp;&nbsp;	tb1.setField1(tb1.getField1()+&quot;1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.update(tb1);
+&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.flush();
+&nbsp;&nbsp;&nbsp;&nbsp;	//自定义线程类的传参方式，set属性
+&nbsp;&nbsp;&nbsp;&nbsp;	myThreadTest.setTbls(tbls);
+&nbsp;&nbsp;&nbsp;&nbsp;	//执行线程，使用submit方法可以捕获异常（使用submit需要自定义线程类实现Callable接口）
+&nbsp;&nbsp;&nbsp;&nbsp;	threadPoolTaskExecutor.submit(myThreadTest);
+&nbsp;&nbsp;&nbsp;&nbsp;	return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//线程中调用的方法（这个方法不是线程）
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;test(List&lt;Table1&gt;&nbsp;tbls)&nbsp;{
+		for&nbsp;(Table1&nbsp;table1&nbsp;:&nbsp;tbls)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	table1.setField1(table1.getField1()+&quot;2&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.update(table1);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.save(table1);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	hibernateTemplate.flush();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	//throw&nbsp;new&nbsp;RuntimeException();//模拟抛异常
+		}
+	}</pre><p>package com.xxx.thread.MyThreadTest.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.thread;
+import&nbsp;java.io.Serializable;
+import&nbsp;java.util.List;
+import&nbsp;java.util.concurrent.Callable;
+import&nbsp;org.hibernate.Session;
+import&nbsp;org.hibernate.Transaction;
+import&nbsp;org.springframework.beans.factory.annotation.Autowired;
+import&nbsp;org.springframework.orm.hibernate5.HibernateTemplate;
+import&nbsp;org.springframework.stereotype.Component;
+import&nbsp;com.xxx.bean.Table1;
+import&nbsp;com.xxx.comp.ComTest;
+@Component
+public&nbsp;class&nbsp;MyThreadTest&nbsp;implements&nbsp;Callable&lt;Object&gt;,&nbsp;Serializable{
+	private&nbsp;static&nbsp;final&nbsp;long&nbsp;serialVersionUID&nbsp;=&nbsp;1955818947098319117L;
+	@Autowired
+	private&nbsp;ComTest&nbsp;comTest;
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+	private&nbsp;List&lt;Table1&gt;&nbsp;tbls;
+	public&nbsp;void&nbsp;setTbls(List&lt;Table1&gt;&nbsp;tbls)&nbsp;{
+		this.tbls&nbsp;=&nbsp;tbls;
+	}
+	@Override
+	public&nbsp;Object&nbsp;call()&nbsp;throws&nbsp;Exception&nbsp;{
+		System.out.println(&quot;进入线程&quot;);
+		//重新开启会话
+		Session&nbsp;s&nbsp;=&nbsp;hibernateTemplate.getSessionFactory().openSession();
+		Transaction&nbsp;tx&nbsp;=&nbsp;s.beginTransaction();
+		//开启事务
+		tx.begin();
+		try&nbsp;{
+		&nbsp;&nbsp;&nbsp;&nbsp;//传参执行
+			comTest.test(tbls);
+			//没有出现异常，提交事务
+			tx.commit();
+		}&nbsp;catch&nbsp;(Exception&nbsp;e)&nbsp;{
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//执行中出现异常，事务回滚
+			if&nbsp;(tx&nbsp;!=&nbsp;null)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.rollback();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw&nbsp;new&nbsp;RuntimeException(e);
+		}&nbsp;finally&nbsp;{
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//重要：关闭会话
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s.close();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+		System.out.println(&quot;线程执行完毕&quot;);
+		//Callable可以有返回值，Runable没有返回值
+		return&nbsp;null;
+	}
+}</pre>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

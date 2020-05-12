@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4>HibernateTemplate HQL<!--!doctype--></h4><p>HQL使用及绑定传参示例：</p><pre class="brush:java;toolbar:false">@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;&nbsp;{
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/HQL&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateHQLExample()&nbsp;throws&nbsp;Exception{
+		Session&nbsp;s&nbsp;=&nbsp;hibernateTemplate.getSessionFactory().getCurrentSession();
+		Query&lt;Table1&gt;&nbsp;query&nbsp;=&nbsp;s.createQuery(&quot;from&nbsp;Table1&nbsp;where&nbsp;field1=&nbsp;:pramList&nbsp;&quot;,&nbsp;Table1.class);
+		//可以用数组绑定参数查询
+		Object[]&nbsp;objPram&nbsp;=&nbsp;new&nbsp;Object[]{&quot;01&quot;};
+		query.setParameterList(&quot;pramList&quot;,&nbsp;objPram);
+		List&lt;Table1&gt;&nbsp;ls&nbsp;=&nbsp;query.getResultList();//执行查询
+		
+		//也可以用collection集合绑定参数查询
+		List&lt;String&gt;&nbsp;listPram&nbsp;=&nbsp;new&nbsp;ArrayList&lt;String&gt;();
+		listPram.add(&quot;1&quot;);
+		query.setParameterList(&quot;pramList&quot;,&nbsp;listPram);
+		List&lt;Table1&gt;&nbsp;ls2&nbsp;=&nbsp;query.getResultList();//执行查询
+		
+		System.out.println(ls.toString()+ls2.toString());
+		return&nbsp;&quot;index.jsp&quot;;
+	}
+}</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

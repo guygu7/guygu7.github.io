@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>springMVC 注解</strong></p><p>首先说明一个误区：</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网上大多数教程和资料都说明 @Controller&nbsp;@Service @Repository @Component 4个功能是一样的。但经测试仅有在使用@Controller时，@RequestMapping才会有效，使用其他3个注解时@RequestMapping都无效。测试版本为springframework-5.2.3RELEASE</p><p>本例对注解的使用方法集中展示包含 @Controller&nbsp;@RequestMapping&nbsp;@RequestParam&nbsp;@ResponseBody 的配置</p><p>首先配置对注解的扫描</p><p>springmvc.xml</p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+&nbsp;&nbsp;&nbsp;xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+&nbsp;&nbsp;&nbsp;xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+&nbsp;&nbsp;&nbsp;xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+&nbsp;&nbsp;&nbsp;xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc.xsd
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context&nbsp;
+&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context/spring-context-3.0.xsd&quot;&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;启用注解驱动，会自动配置
+&nbsp;	&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping&quot;&gt;
+	&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter&quot;&gt;&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;扫描spring的注解：设置哪些包下的文件进行扫描&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&lt;context:component-scan&nbsp;base-package=&quot;com.xxx.*&quot;&nbsp;&gt;&lt;/context:component-scan&gt;
+&lt;/beans&gt;</pre><p>com.xxx.controller.ControllerExample</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;org.springframework.web.bind.annotation.RequestMethod;
+import&nbsp;org.springframework.web.bind.annotation.RequestParam;
+import&nbsp;org.springframework.web.bind.annotation.ResponseBody;
+/**
+&nbsp;*&nbsp;注册为Spring的Bean，在后面配置beanName，缺省值为类名
+&nbsp;*&nbsp;@Controller(&quot;ControllerExample&quot;)
+&nbsp;*&nbsp;@Controller(value=&quot;ControllerExample&quot;)
+&nbsp;*/
+@Controller
+public&nbsp;class&nbsp;ControllerExample&nbsp;{
+	
+	//最简化的例子，如果配置@RequestMapping(&quot;*&quot;)，所有请求都会映射到此
+	@RequestMapping(&quot;/ControllerExample/methodExample&quot;)
+	public&nbsp;String&nbsp;methodExample(Object&nbsp;pram){
+		return&nbsp;&quot;&quot;;
+	}
+	
+	@RequestMapping(
+		//所有参数均可以设定多个值，以&nbsp;参数={&quot;value1&quot;,&quot;value2&quot;}的格式
+		value&nbsp;=&nbsp;&quot;methodExample1&quot;,//映射的URL地址，可以映射多个URL，方法value={&quot;/url1&quot;,&quot;/url2&quot;}
+		method&nbsp;=&nbsp;RequestMethod.POST,//设定处理的请求类型&nbsp;GET&nbsp;POST&nbsp;或者其他
+		consumes&nbsp;=&nbsp;&quot;application/html&quot;,//仅处理请求头Accept包含&quot;application/html&quot;内容
+		produces&nbsp;=&nbsp;&quot;application/html&quot;,//同consumes一样，但是增加通知客户端返回类型也为&quot;application/html&quot;
+		params&nbsp;=&nbsp;&quot;pram=value&quot;,//仅处理请求中有参数pram值为value的请求
+		headers&nbsp;=&nbsp;&quot;Accept=application/html&quot;//可以设定任意的请求头，如&quot;Host=localhost:8080&quot;或其他
+	)
+	public&nbsp;String&nbsp;methodExample1(
+			@RequestParam(
+				value&nbsp;=&nbsp;&quot;pramName&quot;,//映射参数名称，设定后将传入的pramName值作为pram的值，缺省值为原参数名称pram
+				required&nbsp;=&nbsp;true,//该参数是否必须，缺省值为true，请求中无该参数则抛异常
+				defaultValue&nbsp;=&nbsp;&quot;&quot;//参数pram的默认值，设置该参数则自动设定required=flase
+			)&nbsp;Object&nbsp;pram){
+		/**
+		&nbsp;*&nbsp;返回值前缀设定后，自定义视图解析器的配置失效，会使用Spring默认的视图解析器
+		&nbsp;*&nbsp;return&nbsp;&quot;redirect:index.jsp&quot;;&nbsp;重定向
+		&nbsp;*&nbsp;return&nbsp;&quot;forward:index.jsp&quot;;&nbsp;请求转发
+		&nbsp;*&nbsp;没有前缀自定义视图解析器的配置生效
+		&nbsp;*&nbsp;return&nbsp;&quot;index.jsp&quot;;&nbsp;如缺省前缀则默认是请求转发
+		&nbsp;*/
+		return&nbsp;&quot;index.jsp&quot;;
+	};
+	
+	/**
+	&nbsp;*&nbsp;@ResponseBody&nbsp;修改返回响应头，并且不再跳转
+	&nbsp;*/
+	@RequestMapping(&quot;/ControllerExample/methodExample2&quot;)
+	@ResponseBody
+	public&nbsp;ObjectTest&nbsp;methodExample2(Object&nbsp;pram){
+		/**
+		&nbsp;*&nbsp;可以返回一个具体对象。
+		&nbsp;*&nbsp;若可以转为json字符串则修改响应头为application/json，同时返回json字符串。
+		&nbsp;*&nbsp;若无法转为json则修改响应头为text/html，同时返回字符串。
+		&nbsp;*&nbsp;如果出现中文乱码，在@RequestMapping中produces增加charset=utf-8
+		&nbsp;*/
+		return&nbsp;new&nbsp;ObjectTest();
+	}
+	class&nbsp;ObjectTest{
+		String&nbsp;pram1&nbsp;=&nbsp;&quot;参数1&quot;;
+	}
+	
+}</pre><p><br/></p><p><strong><br/></strong></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

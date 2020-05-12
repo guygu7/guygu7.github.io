@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+	<h4>
+		Spring IOC（控制反转） &amp; DI（依赖注入）
+	</h4>
+	<p>
+		IOC是spring最核心功能，即配置bean的实例化
+	</p>
+	<p>
+		需要注意ApplicationContext
+	</p>
+	<p>
+		创建对象实例的三种方法：
+	</p>
+	<p>
+		一、最简单也是常用的配置方法：默认的无参构造方法。
+	</p>
+	<p>
+		二、调用不同的构造方法创建Bean实例：有参构造方法，可以传参。
+	</p>
+	<p>
+		三、工厂模式：调用工厂类的方法创建Bean实例。
+	</p>
+	<p style="white-space: normal;">
+		另外：第一种方法给属性赋初始值的方法。
+	</p>
+	<p>
+		<br/>
+	</p>
+	<p>
+		<strong>一、最简单也是常用的配置方法：默认的无参构造方法</strong>
+	</p>
+	<p>
+		配置文件：applicationContext.xml
+	</p>
+	<pre class="brush:xml;toolbar:false">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+	&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+		xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+		&lt;bean id=&quot;BeanObj&quot; class=&quot;com.xxx.bo.BeanObj&quot;/&gt;
+	&lt;/beans&gt;</pre>
+	<p>
+		com.xxx.bo.BeanObj.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj {
+		private String pram1;
+		public BeanObj() {
+			super();
+		}
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;]&quot;;
+		}
+	}</pre>
+	<p>
+		运行调用文件：com.xxx.test.test.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.test;
+	import org.springframework.context.ApplicationContext;
+	import org.springframework.context.support.ClassPathXmlApplicationContext;
+	import com.xxx.bo.BeanObj;
+	public class test {
+		public static void main(String[] args) {
+			ApplicationContext ctx = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+			BeanObj beanObj = ctx.getBean(&quot;BeanObj&quot;,BeanObj.class);
+			System.out.println(beanObj);
+		}
+	}</pre>
+	<p>
+		<strong>二、调用不同的构造方法创建Bean实例：有参构造方法，可以传参</strong><br/>
+	</p>
+	<p style="white-space: normal;">
+		配置文件：applicationContext.xml
+	</p>
+	<pre class="brush:xml;toolbar:false">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+	&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+		xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+					http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+		&lt;bean id=&quot;BeanObj&quot; class=&quot;com.xxx.bo.BeanObj&quot;&gt;
+				&lt;constructor-arg index=&quot;0&quot; name=&quot;pram1&quot; type=&quot;java.lang.String&quot; value=&quot;初始化测试&quot;&gt;&lt;/constructor-arg&gt;
+		&lt;/bean&gt;
+	&lt;/beans&gt;</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObj.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj {
+		private String pram1;
+		public BeanObj() {
+			super();
+		}
+		//本例中所调用的有参构造方法
+		public BeanObj(String pram1) {
+			super();
+			this.pram1 = pram1;
+		}
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;]&quot;;
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		运行调用文件：com.xxx.test.test.java
+	</p>
+	<p>
+		&nbsp;&nbsp;&nbsp;&nbsp;同上
+	</p>
+	<p>
+		<strong>三、工厂模式：调用工厂类的方法创建Bean实例</strong>
+	</p>
+	<p style="white-space: normal;">
+		配置文件：applicationContext.xml
+	</p>
+	<pre class="brush:xml;toolbar:false">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+	&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+		xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+					http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+		&lt;!-- 调用BeanObjFactory工厂类的newInstance方法创建 --&gt;
+		&lt;bean id=&quot;BeanObj&quot; class=&quot;com.xxx.bo.BeanObjFactory&quot; factory-method=&quot;newInstance&quot;&gt;&lt;/bean&gt;
+	&lt;/beans&gt;</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObjFactory.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObjFactory {
+		public static BeanObj newInstance(){
+			return new BeanObj(&quot;测试&quot;);
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObj.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj {
+		private String pram1;
+		public BeanObj() {
+			super();
+		}
+		//本例中所调用的有参构造方法
+		public BeanObj(String pram1) {
+			super();
+			this.pram1 = pram1;
+		}
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;]&quot;;
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		运行调用文件：com.xxx.test.test.java
+	</p>
+	<p style="white-space: normal;">
+		&nbsp;&nbsp;&nbsp;&nbsp;同上
+	</p>
+	<p style="white-space: normal;">
+		<strong>另外：第一种方法给属性赋初始值，与第二种方法的的区别：使用无参构造方法创建实例并给属性赋初始值</strong>
+	</p>
+	<p style="white-space: normal;">
+		配置文件：applicationContext.xml
+	</p>
+	<pre class="brush:xml;toolbar:false">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+	&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+		xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+		&lt;bean id=&quot;BeanObj&quot; class=&quot;com.xxx.bo.BeanObj&quot;&gt;
+			&lt;property name=&quot;pram1&quot;&gt;
+				&lt;value&gt;赋初始值&lt;/value&gt;
+			&lt;/property&gt;
+			&lt;!-- 当然属性也可以是set、list、map的集合
+			&lt;property name=&quot;sets&quot;&gt;
+						&lt;set&gt;&lt;value&gt;1&lt;/value&gt;&lt;/set&gt;
+					&lt;/property&gt;
+					&lt;property name=&quot;list&quot; value=&quot;1&quot;&gt;&lt;/property&gt;
+					&lt;property name=&quot;attr&quot; &gt;
+						&lt;array&gt;&lt;value&gt;1&lt;/value&gt;&lt;/array&gt;
+					&lt;/property&gt;
+					&lt;property name=&quot;map&quot;&gt;
+						&lt;map&gt;
+							&lt;entry key=&quot;a&quot; value=&quot;b&quot; &gt;&lt;/entry&gt;
+						&lt;/map&gt;
+					&lt;/property&gt;
+			--&gt;
+		&lt;/bean&gt;
+	&lt;/beans&gt;</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObj.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj {
+		private String pram1;
+		public BeanObj() {
+			super();
+		}
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;]&quot;;
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		运行调用文件：com.xxx.test.test.java
+	</p>
+	<p style="white-space: normal;">
+		&nbsp;&nbsp;&nbsp;&nbsp;同上
+	</p>
+	<hr/>
+	<p>
+		<strong>DI，简单说就是将一个实例注入到另一个实例中，上面例子中属性赋值也属于DI</strong>
+	</p>
+	<p>
+		比如BeanObj2注入到BeanObj
+	</p>
+	<p style="white-space: normal;">
+		配置文件：applicationContext.xml
+	</p>
+	<pre class="brush:xml;toolbar:false">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+	&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+		xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+		&lt;bean id=&quot;BeanObj&quot; class=&quot;com.xxx.bo.BeanObj&quot;&gt;
+			&lt;property name=&quot;pram1&quot;&gt;
+				&lt;value&gt;赋值&lt;/value&gt;
+			&lt;/property&gt;
+			&lt;property name=&quot;BeanObj2&quot; ref=&quot;BeanObj2&quot;&gt;&lt;/property&gt;
+		&lt;/bean&gt;
+		&lt;bean id=&quot;BeanObj2&quot; class=&quot;com.xxx.bo.BeanObj2&quot;&gt;
+			&lt;property name=&quot;pram1&quot;&gt;
+				&lt;value&gt;赋值2&lt;/value&gt;
+			&lt;/property&gt;
+		&lt;/bean&gt;
+	&lt;/beans&gt;</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObj.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj {
+		private String pram1;
+		private BeanObj2 beanObj2;
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		public BeanObj2 getBeanObj2() {
+			return beanObj2;
+		}
+		public void setBeanObj2(BeanObj2 beanObj2) {
+			this.beanObj2 = beanObj2;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;, beanObj2=&quot; + beanObj2 + &quot;]&quot;;
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		com.xxx.bo.BeanObj2.java
+	</p>
+	<pre class="brush:java;toolbar:false">package com.xxx.bo;
+	public class BeanObj2 {
+		private String pram1;
+		public BeanObj2() {
+			super();
+		}
+		public String getPram1() {
+			return pram1;
+		}
+		public void setPram1(String pram1) {
+			this.pram1 = pram1;
+		}
+		@Override
+		public String toString() {
+			return &quot;BeanObj [pram1=&quot; + pram1 + &quot;]&quot;;
+		}
+	}</pre>
+	<p style="white-space: normal;">
+		运行调用文件：com.xxx.test.test.java
+	</p>
+	<p style="white-space: normal;">
+		&nbsp;&nbsp;&nbsp;&nbsp;同上
+	</p>
+	<p>
+		运行结果：
+	</p>
+	<p>
+		BeanObj [pram1=赋值, beanObj2=BeanObj [pram1=赋值2]]<br/>
+	</p> <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

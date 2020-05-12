@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h3><strong>Spring Data JdbcTemplate 配置</strong></h3><p>一、配置文件</p><p style="white-space: normal;">注意点：</p><p style="white-space: normal;">1. &lt;tx:advice&gt; 依赖aspectj，需要添加jar包，本例使用的是com.springsource.org.aspectj.weaver.jar。另外说明：tx:advice才需要依赖，&lt;aop:&gt;本身不需要依赖。</p><p style="white-space: normal;">2. 本示例为简化配置说明，直接使用Controller类做测试，没有使用连接池及properties文件。</p><p style="white-space: normal;">配置：</p><p style="white-space: normal;">JdbcTemplate的主要配置在springmvc.xml中，固web.xml在此省略。</p><p>springmvc.xml<strong><br/></strong></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xsi:schemaLocation=&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/context/spring-context-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&quot;&gt;
+	&lt;!--&nbsp;启用注解驱动，会自动配置&nbsp;&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping&quot;&gt;&nbsp;
+		&lt;bean&nbsp;class=&quot;org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter&quot;&gt;&nbsp;--&gt;
+	&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+	&lt;!--&nbsp;扫描spring的IOC注解：设置哪些包下的文件进行扫描&nbsp;--&gt;
+	&lt;context:component-scan&nbsp;base-package=&quot;com.xxx.*&quot;&gt;&lt;/context:component-scan&gt;
+
+	&lt;!--&nbsp;Data数据源配置&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;dataSource&quot;&nbsp;class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+		&lt;property&nbsp;name=&quot;driverClassName&quot;&nbsp;value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;url&quot;&nbsp;value=&quot;jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;username&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+		&lt;property&nbsp;name=&quot;password&quot;&nbsp;value=&quot;root&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+
+	&lt;!--&nbsp;配置&nbsp;Spring&nbsp;的&nbsp;JdbcTemplate&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;jdbcTemplate&quot;&nbsp;class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+		&lt;property&nbsp;name=&quot;dataSource&quot;&nbsp;ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+	&lt;/bean&gt;
+	
+	&lt;!--&nbsp;JDBC事务管理器&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;bean&nbsp;id=&quot;jdbcTransactionManager&quot;&nbsp;class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;数据源&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property&nbsp;name=&quot;dataSource&quot;&nbsp;ref=&quot;dataSource&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/bean&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;传播行为&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:advice&nbsp;id=&quot;txAdvice&quot;&nbsp;transaction-manager=&quot;jdbcTransactionManager&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;		&lt;!--&nbsp;通知（详细参数说明见下方表格）&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;tx:method&nbsp;name=&quot;*&quot;&nbsp;propagation=&quot;REQUIRED&quot;&nbsp;read-only=&quot;false&quot;//&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:attributes&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tx:advice&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;切面配置哪些方法开启事务&nbsp;--&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;aop:advisor&nbsp;advice-ref=&quot;txAdvice&quot;&nbsp;pointcut=&quot;execution(*&nbsp;com.xxx.controller.*.*(..))&quot;&nbsp;/&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/aop:config&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;/beans&gt;</pre><p>&lt;tx:method&gt;详细参数表<br/></p><table><tbody><tr class="firstRow"><td width="140" valign="top" style="word-break: break-all;">name</td><td width="285" valign="top" style="word-break: break-all;">例：inster* ins* update* save*等</td><td width="542" valign="top" style="word-break: break-all;">该标签对应的方法</td></tr><tr><td width="118" valign="top" style="word-break: break-all;" rowspan="2" colspan="1">read-only</td><td width="285" valign="top" style="word-break: break-all;">true<br/></td><td width="542" valign="top" style="word-break: break-all;">只读事务<br/></td></tr><tr><td width="141" valign="top" style="word-break: break-all;">false（默认值）</td><td width="356" valign="top" style="word-break: break-all;">非只读事务，需要提交，增删改必须为此</td></tr><tr><td width="140" valign="top" style="word-break: break-all;" rowspan="7" colspan="1">propagation</td><td width="271" valign="top" style="word-break: break-all;">REQUIRED (默认值)</td><td width="542" valign="top" style="word-break: break-all;">有事务当前事务执行，没有事务则开启事务</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">SUPPORTS</td><td width="356" valign="top" style="word-break: break-all;">有事务当前事务执行，没有事务则非事务状态执行</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">MANDATORY</td><td width="356" valign="top" style="word-break: break-all;">有事务当前事务执行，没有事务则抛异常</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">NEVER</td><td width="356" valign="top" style="word-break: break-all;">有事务则抛异常</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">REQUIRES_NEW</td><td width="356" valign="top" style="word-break: break-all;">新建事务执行，如有事务当前事务挂起</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">NOT_SUPPORTED</td><td width="356" valign="top" style="word-break: break-all;">在非事务状态执行，如有事务当前事务挂起</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="141">NESTED</td><td valign="top" colspan="1" rowspan="1" width="356" style="word-break: break-all;">新建事务执行，如有事务则嵌套事务</td></tr><tr><td valign="top" colspan="1" rowspan="5" style="word-break: break-all;" width="140">isolation</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="271">DEFAULT(默认值)</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="542">数据库自动判断</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="141">READ_UNCOMMITTED</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="356">读未提交</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="141">READ_COMMITTED</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="356">读已提交</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="141">REPEATABLE_READ</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="356">对读取数据添加锁</td></tr><tr><td width="141" valign="top" style="word-break: break-all;">SERIALIZABLE</td><td width="356" valign="top" style="word-break: break-all;">对读取表添加锁</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="140">rollback-for</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="277">java.lang.Exception (默认值)</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="542">抛出异常时回滚（不显示配置某些情况可能不回滚，建议显示设置）</td></tr><tr><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="140">no-rollback-for</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="277">自定义异常类</td><td valign="top" colspan="1" rowspan="1" style="word-break: break-all;" width="542">抛出某异常时不回滚</td></tr></tbody></table><p><br/></p><p>二、两种获取使用JdbcTemplate的方法：</p><p>1、直接使用自动注入</p><p>com.xxx.controller.ControllerTest</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.List;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.beans.factory.annotation.Autowired;
+import&nbsp;org.springframework.jdbc.core.JdbcTemplate;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;{
+	@Autowired
+	private&nbsp;JdbcTemplate&nbsp;jdbcTemplate;
+	@RequestMapping(&quot;/jdbcTemplate&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;jdbcTemplateExample(){
+&nbsp;&nbsp;&nbsp;&nbsp;	List&lt;Map&lt;String,&nbsp;Object&gt;&gt;&nbsp;ls&nbsp;=&nbsp;jdbcTemplate.queryForList(&quot;SELECT&nbsp;*&nbsp;FROM&nbsp;table1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	jdbcTemplate.update(&quot;UPDATE&nbsp;table1&nbsp;SET&nbsp;field1=&#39;2&#39;&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>2、通过ApplicationContext获取托管到spring的bean，这里使用自定义工具类</p><p>com.xxx.controller.ControllerTest2</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.controller;
+import&nbsp;java.util.List;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.jdbc.core.JdbcTemplate;
+import&nbsp;org.springframework.stereotype.Controller;
+import&nbsp;org.springframework.web.bind.annotation.RequestMapping;
+import&nbsp;com.xxx.utils.SpringUtils;
+@Controller
+public&nbsp;class&nbsp;ControllerTest2&nbsp;{
+	@RequestMapping(&quot;/jdbcTemplate2&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;jdbcTemplateExample2(){
+&nbsp;&nbsp;&nbsp;&nbsp;	JdbcTemplate&nbsp;jdbcTemplate&nbsp;=&nbsp;SpringUtils.getBean(&quot;jdbcTemplate&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	List&lt;Map&lt;String,&nbsp;Object&gt;&gt;&nbsp;ls&nbsp;=&nbsp;jdbcTemplate.queryForList(&quot;SELECT&nbsp;*&nbsp;FROM&nbsp;table1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;	jdbcTemplate.update(&quot;UPDATE&nbsp;table1&nbsp;SET&nbsp;field1=&#39;3&#39;&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p>工具类：com.xxx.utils.SpringUtils</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.utils;
+import&nbsp;java.util.Map;
+import&nbsp;org.springframework.beans.BeansException;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.ApplicationContextAware;
+import&nbsp;org.springframework.stereotype.Component;
+/**
+&nbsp;*&nbsp;Spring&nbsp;ApplicationContext&nbsp;工具类
+*/
+@SuppressWarnings(&quot;unchecked&quot;)
+@Component
+public&nbsp;class&nbsp;SpringUtils&nbsp;implements&nbsp;ApplicationContextAware&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;static&nbsp;ApplicationContext&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;setApplicationContext(ApplicationContext&nbsp;applicationContext)&nbsp;throws&nbsp;BeansException&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SpringUtils.applicationContext&nbsp;=&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;ApplicationContext&nbsp;getApplicationContext(){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;applicationContext;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;T&nbsp;getBean(String&nbsp;beanName)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(applicationContext.containsBean(beanName)){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;(T)&nbsp;applicationContext.getBean(beanName);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;null;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;&lt;T&gt;&nbsp;Map&lt;String,&nbsp;T&gt;&nbsp;getBeansOfType(Class&lt;T&gt;&nbsp;baseType){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;applicationContext.getBeansOfType(baseType);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

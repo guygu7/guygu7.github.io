@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4>HibernateTemplate 提供的一些操作方法示例</h4><p>暂时只记录了查询，增删改相对简单暂不记录。</p><p>查询：<br/></p><pre class="brush:java;toolbar:false">public&nbsp;class&nbsp;ControllerTest&nbsp;&nbsp;{
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+	
+	//查询
+	@SuppressWarnings(&quot;unused&quot;)
+	@RequestMapping(&quot;/test1&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample1()&nbsp;throws&nbsp;Exception{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Table1&nbsp;table1_1&nbsp;=&nbsp;new&nbsp;Table1();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table1_1.setField1(&quot;1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.findByExample(table1_1);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//分页查询
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/test2&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample2()&nbsp;throws&nbsp;Exception{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Table1&nbsp;table1_1&nbsp;=&nbsp;new&nbsp;Table1();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table1_1.setField1(&quot;1&quot;);
+	&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.findByExample(table1_1,0,1);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//get查询，第二参数为主键
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/test3&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample3()&nbsp;throws&nbsp;Exception{
+	&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.get(Table1.class,&nbsp;&quot;1&quot;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//load查询，存在延迟加载问题
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/test4&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample4()&nbsp;throws&nbsp;Exception{
+	&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.load(Table1.class,&nbsp;&quot;1&quot;);
+		hibernateTemplate.loadAll(Table1.class);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//查缓存。检查给定对象是否在会话缓存中。
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/test5&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample5()&nbsp;throws&nbsp;Exception{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Table1&nbsp;table1&nbsp;=&nbsp;hibernateTemplate.get(Table1.class,&nbsp;&quot;1&quot;);
+		hibernateTemplate.contains(table1);//查缓存
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;//其他设置
+&nbsp;&nbsp;&nbsp;&nbsp;@RequestMapping(&quot;/test5&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateExample5()&nbsp;throws&nbsp;Exception{
+	&nbsp;&nbsp;&nbsp;&nbsp;//设置、获取查询记录数上限，默认是0
+	&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.setFetchSize(0);
+		hibernateTemplate.getFetchSize();
+		//设置、获取分页大小
+		hibernateTemplate.setMaxResults(0);
+		hibernateTemplate.getMaxResults();
+		//清空缓存。从会话缓存中删除所有对象，并取消所有挂起的保存、更新和删除。
+		hibernateTemplate.clear();
+		//从会话清除指定对象缓存
+		Table1&nbsp;table1&nbsp;=&nbsp;hibernateTemplate.get(Table1.class,&nbsp;&quot;1&quot;);
+		hibernateTemplate.evict(table1);//清除指定对象缓存
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;
+}</pre><p>其他的方法：</p><pre class="brush:java;toolbar:false">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//当前会话指定操作
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.execute(null);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//本机会话指定操作
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hibernateTemplate.executeWithNativeSession(null);</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

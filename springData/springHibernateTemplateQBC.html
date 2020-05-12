@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4>HibernateTemplate QBC查询<!--!doctype--></h4><p>QBC查询，即Criteria标准对象查询</p><pre class="brush:java;toolbar:false">@Controller
+public&nbsp;class&nbsp;ControllerTest&nbsp;&nbsp;{
+	@Autowired
+	private&nbsp;HibernateTemplate&nbsp;hibernateTemplate;
+	@RequestMapping(&quot;/QBC&quot;)
+&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;String&nbsp;hibernateTemplateQBCExample()&nbsp;throws&nbsp;Exception{
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//等于条件：field1=&#39;1&#39;
+			criteria.add(Restrictions.eq(&quot;field1&quot;,&quot;1&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//Like条件
+			criteria.add(Restrictions.like(&quot;field1&quot;,&quot;1%&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		//Like条件
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//以什么开头
+			criteria.add(Restrictions.like(&quot;field1&quot;,&quot;1&quot;,&nbsp;MatchMode.START));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//以什么结尾
+			criteria.add(Restrictions.like(&quot;field1&quot;,&quot;1&quot;,&nbsp;MatchMode.END));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//任意位置
+			criteria.add(Restrictions.like(&quot;field1&quot;,&quot;1&quot;,&nbsp;MatchMode.ANYWHERE));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			criteria.add(Restrictions.like(&quot;field1&quot;,&quot;1&quot;,&nbsp;MatchMode.EXACT));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			System.out.println(&quot;大于等于&nbsp;&gt;=&quot;);
+			//大于等于&gt;=条件
+			criteria.add(Restrictions.ge(&quot;field1&quot;,&quot;1&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			System.out.println(&quot;大于&gt;&quot;);
+			//大于&gt;条件
+			criteria.add(Restrictions.gt(&quot;field1&quot;,&quot;1&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			System.out.println(&quot;小于&lt;&quot;);
+			//小于&lt;条件
+			criteria.add(Restrictions.geProperty(&quot;field1&quot;,&quot;1&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			System.out.println(&quot;and条件&quot;);
+			//and条件
+			criteria.add(Restrictions.and(
+						Restrictions.eq(&quot;field1&quot;,&quot;1&quot;),Restrictions.eq(&quot;field1&quot;,&quot;1&quot;),Restrictions.eq(&quot;field1&quot;,&quot;1&quot;)
+					));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//排序
+			criteria.addOrder(Order.asc(&quot;field1&quot;));
+			hibernateTemplate.findByCriteria(criteria);
+		}
+		
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//分页
+			hibernateTemplate.findByCriteria(criteria,0,1);
+		}
+		
+		if(true)&nbsp;{
+			DetachedCriteria&nbsp;criteria=DetachedCriteria.forClass(Table1.class);
+			//count
+			criteria.setProjection(Projections.rowCount());
+			hibernateTemplate.findByCriteria(criteria);
+		}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&quot;index.jsp&quot;;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>

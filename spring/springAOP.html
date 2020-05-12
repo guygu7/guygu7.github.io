@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<p><strong>Spring AOP</strong></p><p>Spring AOP 依赖&nbsp;AspectJ，本例为最简单的说明示例，使用时需添加&nbsp;aopalliance.jar。</p><p>另外网上各种资料显示需要aspectjrt.jar、aspectjweaver.jar、aspectj.jar、aopalliance.jar四个jar包，但本例中使用Spring5经实际测试仅需添加aopalliance.jar即可运行。</p><p>两种使用方法，XML和注解</p><p><strong><span style="color:#333333;font-family:-apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif"><span style="font-size: 14px;">一、XML的使用方法：</span></span></strong></p><p><span style="color:#333333;font-family:-apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif"><span style="font-size: 14px;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">配置文件：applicationContext.xml（</span></span></span><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">注意，需要导入&nbsp;<span style="font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; background-color: rgb(255, 255, 255);">spring-aop j 的</span>&nbsp;</span><span style="font-family: Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 14px; white-space: pre-wrap;">schema 如下）</span></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-3.0.xsd&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&nbsp;&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;配置被切入的类&nbsp;BeanObj.java&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;BeanObj&quot;&nbsp;class=&quot;com.xxx.bo.BeanObj&quot;&gt;&lt;/bean&gt;
+	&lt;!--&nbsp;配置切入的类&nbsp;aBean.java&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;aBean&quot;&nbsp;class=&quot;com.xxx.bo.aBean&quot;&gt;&lt;/bean&gt;
+	&lt;aop:config&gt;
+		&lt;aop:aspect&nbsp;ref=&quot;aBean&quot;&gt;
+		&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;expression表达式为被切入的类和方法（本例切全部方法）&nbsp;--&gt;
+			&lt;aop:pointcut&nbsp;id=&quot;businessService&quot;&nbsp;expression=&quot;execution(*&nbsp;com.xxx.bo.BeanObj.*(..))&quot;&nbsp;/&gt;
+			&lt;!--&nbsp;前置切入,必须配置pointcut或pointcut-ref&nbsp;--&gt;
+			&lt;aop:before&nbsp;pointcut-ref=&quot;businessService&quot;&nbsp;&nbsp;method=&quot;before&quot;/&gt;
+			&lt;!--&nbsp;后置切入（无异常）,必须配置pointcut或pointcut-ref&nbsp;--&gt;
+			&lt;aop:after-returning&nbsp;pointcut-ref=&quot;businessService&quot;&nbsp;method=&quot;afterReturn&quot;/&gt;
+			&lt;!--&nbsp;环绕切入,必须配置pointcut或pointcut-ref&nbsp;--&gt;
+			&lt;aop:around&nbsp;pointcut-ref=&quot;businessService&quot;&nbsp;method=&quot;around&quot;/&gt;
+			&lt;!--&nbsp;异常抛出切入,必须配置pointcut或pointcut-ref&nbsp;--&gt;
+			&lt;aop:after-throwing&nbsp;pointcut-ref=&quot;businessService&quot;&nbsp;method=&quot;afterException&quot;/&gt;
+			&lt;!--&nbsp;后置切入（总是执行）,必须配置pointcut或pointcut-ref&nbsp;--&gt;
+			&lt;aop:after&nbsp;pointcut-ref=&quot;businessService&quot;&nbsp;method=&quot;after&quot;/&gt;
+		&lt;/aop:aspect&gt;
+	&lt;/aop:config&gt;
+&lt;/beans&gt;</pre><p><span style="color:#333333;font-family:-apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif"><span style="font-size: 14px;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;"></span></span></span>切入类：aBean.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.bo;
+import&nbsp;org.aspectj.lang.ProceedingJoinPoint;
+public&nbsp;class&nbsp;aBean&nbsp;{
+	//前置切入
+	public&nbsp;void&nbsp;before(){
+		System.out.println(&quot;前置切入&quot;);
+	}
+	//后置切入（无异常）
+	public&nbsp;void&nbsp;afterReturn(){
+		System.out.println(&quot;后置切入afterReturn&nbsp;(只出现在没有发生异常)&quot;);
+	}
+	//环绕切入&nbsp;常用，需要ProceedingJoinPoint接口作为参数&nbsp;
+	public&nbsp;Object&nbsp;around(ProceedingJoinPoint&nbsp;pjp)&nbsp;throws&nbsp;Throwable{
+		System.out.println(&quot;环绕切入的之前部分&quot;);
+		Object&nbsp;proceed&nbsp;=&nbsp;pjp.proceed();
+		System.out.println(&quot;环绕切入的之后部分&quot;);
+		return&nbsp;proceed;
+	}
+	//后置切入（总是执行）
+	public&nbsp;void&nbsp;after(){
+		System.out.println(&quot;后置切入after(不管是否发生异常)&quot;);
+	}
+	//异常抛出切入
+	public&nbsp;void&nbsp;afterException(){
+		System.out.println(&quot;异常出现之后的切入&quot;);
+	}
+}</pre><p>被切入类：BeanObj.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.bo;
+public&nbsp;class&nbsp;BeanObj&nbsp;{
+	private&nbsp;String&nbsp;pram1;
+	public&nbsp;String&nbsp;getPram1()&nbsp;{
+		System.out.println(&quot;BeanObj被切方法执行&quot;);
+		return&nbsp;pram1;
+	}
+	public&nbsp;void&nbsp;setPram1(String&nbsp;pram1)&nbsp;{
+		this.pram1&nbsp;=&nbsp;pram1;
+	}
+	@Override
+	public&nbsp;String&nbsp;toString()&nbsp;{
+		return&nbsp;&quot;BeanObj&nbsp;[pram1=&quot;&nbsp;+&nbsp;pram1&nbsp;+&nbsp;&quot;]&quot;;
+	}
+}</pre><p><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">运行调用文件：com.xxx.test.test.java</span></p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.test;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.support.ClassPathXmlApplicationContext;
+import&nbsp;com.xxx.bo.BeanObj;
+public&nbsp;class&nbsp;test&nbsp;{
+	public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)&nbsp;{
+		ApplicationContext&nbsp;ctx&nbsp;=&nbsp;new&nbsp;ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+		BeanObj&nbsp;beanObj&nbsp;=&nbsp;ctx.getBean(&quot;BeanObj&quot;,BeanObj.class);
+		//被切的方法调用
+		beanObj.getPram1();
+	}
+}</pre><p><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;"></span>执行的打印结果：（输出顺序会受到配置顺序的影响）</p><pre class="brush:java;toolbar:false">前置切入
+环绕切入的之前部分
+BeanObj被切方法执行
+后置切入after(不管是否发生异常)
+环绕切入的之后部分
+后置切入afterReturn&nbsp;(只出现在没有发生异常)</pre><hr/><p><strong>二、注解方式</strong><br/></p><p></p><p style="white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif;"><span style="font-size: 14px;"><span style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;">配置文件：applicationContext.xml（</span></span></span><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">注意，需要导入&nbsp;<span style="font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; background-color: rgb(255, 255, 255);">spring-aop j 的</span>&nbsp;</span><span style="font-family: Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 14px; white-space: pre-wrap;">schema 如下）</span></p><pre class="brush:xml;toolbar:false">&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans&nbsp;xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/beans/spring-beans-3.0.xsd&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&nbsp;&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--&nbsp;配置被切入的类&nbsp;BeanObj.java&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;BeanObj&quot;&nbsp;class=&quot;com.xxx.bo.BeanObj&quot;&gt;&lt;/bean&gt;
+	&lt;!--&nbsp;配置切入的类&nbsp;aBean.java&nbsp;--&gt;
+	&lt;bean&nbsp;id=&quot;aBean&quot;&nbsp;class=&quot;com.xxx.bo.aBean&quot;&gt;&lt;/bean&gt;
+	&lt;!--&nbsp;注解方式仅需要此标签即可&nbsp;--&gt;
+	&lt;aop:aspectj-autoproxy/&gt;
+&lt;/beans&gt;</pre><p>切入类：aBean.java</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.bo;
+import&nbsp;org.aspectj.lang.ProceedingJoinPoint;
+import&nbsp;org.aspectj.lang.annotation.After;
+import&nbsp;org.aspectj.lang.annotation.AfterReturning;
+import&nbsp;org.aspectj.lang.annotation.AfterThrowing;
+import&nbsp;org.aspectj.lang.annotation.Around;
+import&nbsp;org.aspectj.lang.annotation.Aspect;
+import&nbsp;org.aspectj.lang.annotation.Before;
+import&nbsp;org.aspectj.lang.annotation.Pointcut;
+@Aspect
+public&nbsp;class&nbsp;aBean&nbsp;{
+	//切入点定义
+	@Pointcut(&quot;execution(*&nbsp;com.xxx.bo.BeanObj.*(..))&quot;)&nbsp;
+	private&nbsp;void&nbsp;businessService()&nbsp;{}&nbsp;
+	//前置切入
+	@Before(&quot;businessService()&quot;)
+	//可以单独定义切入点，如下
+	//@Before(&quot;execution(*&nbsp;com.xxx.bo.BeanObj.*(..))&quot;)
+	public&nbsp;void&nbsp;before(){
+		System.out.println(&quot;前置切入&quot;);
+	}
+	//后置切入
+	@AfterReturning(pointcut&nbsp;=&nbsp;&quot;businessService()&quot;,&nbsp;returning=&quot;retVal&quot;)
+	public&nbsp;void&nbsp;afterReturn(Object&nbsp;retVal){
+		System.out.println(&quot;后置切入afterReturn&nbsp;(只出现在没有发生异常)&quot;);
+	}
+	//环绕切入&nbsp;常用，需要ProceedingJoinPoint接口作为参数&nbsp;
+	@Around(&quot;businessService()&quot;)
+	public&nbsp;Object&nbsp;around(ProceedingJoinPoint&nbsp;pjp)&nbsp;throws&nbsp;Throwable{
+		System.out.println(&quot;环绕切入的之前部分&quot;);
+		Object&nbsp;proceed&nbsp;=&nbsp;pjp.proceed();
+		System.out.println(&quot;环绕切入的之后部分&quot;);
+		return&nbsp;proceed;
+	}
+	//后置切入
+	@After(&quot;businessService()&quot;)
+	public&nbsp;void&nbsp;after(){
+		System.out.println(&quot;后置切入after(不管是否发生异常)&quot;);
+	}
+	//异常抛出切入
+	@AfterThrowing(pointcut&nbsp;=&nbsp;&quot;businessService()&quot;,&nbsp;throwing=&quot;e&quot;)
+	public&nbsp;void&nbsp;afterException(Exception&nbsp;e){
+		System.out.println(&quot;异常出现之后的切入&quot;);
+	}
+}</pre><p>被切入类：BeanObj.java&nbsp;</p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.bo;
+public&nbsp;class&nbsp;BeanObj&nbsp;{
+	private&nbsp;String&nbsp;pram1;
+	public&nbsp;String&nbsp;getPram1()&nbsp;{
+		System.out.println(&quot;BeanObj被切方法执行&quot;);
+		return&nbsp;pram1;
+	}
+	public&nbsp;void&nbsp;setPram1(String&nbsp;pram1)&nbsp;{
+		this.pram1&nbsp;=&nbsp;pram1;
+	}
+	@Override
+	public&nbsp;String&nbsp;toString()&nbsp;{
+		return&nbsp;&quot;BeanObj&nbsp;[pram1=&quot;&nbsp;+&nbsp;pram1&nbsp;+&nbsp;&quot;]&quot;;
+	}
+}</pre><p></p><p style="white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">运行调用文件：com.xxx.test.test.java</span></p><pre class="brush:java;toolbar:false">package&nbsp;com.xxx.test;
+import&nbsp;org.springframework.context.ApplicationContext;
+import&nbsp;org.springframework.context.support.ClassPathXmlApplicationContext;
+import&nbsp;com.xxx.bo.BeanObj;
+public&nbsp;class&nbsp;test&nbsp;{
+	public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)&nbsp;{
+		ApplicationContext&nbsp;ctx&nbsp;=&nbsp;new&nbsp;ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+		BeanObj&nbsp;beanObj&nbsp;=&nbsp;ctx.getBean(&quot;BeanObj&quot;,BeanObj.class);
+		//被切的方法调用
+		beanObj.getPram1();
+	}
+}</pre><p style="white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;"></span>执行的打印结果：（输出顺序会受到配置顺序的影响）</p><pre class="brush:java;toolbar:false">环绕切入的之前部分
+前置切入
+BeanObj被切方法执行
+环绕切入的之后部分
+后置切入after(不管是否发生异常)
+后置切入afterReturn&nbsp;(只出现在没有发生异常)</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>
