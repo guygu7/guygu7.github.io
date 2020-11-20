@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="../../ueditor/third-party/SyntaxHighlighter/shCoreDefault.css">
+    <title>私人资料站</title>
+  </head>
+  <body style="background:transparent;">
+<h4 style="white-space: normal; color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">Vue-router 路由的简单配置与使用</h4><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">首先说明&nbsp;</span><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">Vue-router的路由 是对<strong>组件</strong>进行渲染控制，并不会刷新页面。</span></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;"><span style="font-size: 14px;">在点击路由后会修改URL #号后的部分，例：</span></span></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;"><span style="font-size: 14px;">点击前：http://localhost:8080</span></span></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">点击后：http://localhost:8080/#/routes1&nbsp;&nbsp;</span></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;"><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">关于 URL# 可以百度</span><span style="color: rgb(51, 51, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px;">&nbsp;URL hash</span></p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">main.js</p><pre class="brush:js;toolbar:false">import&nbsp;Vue&nbsp;from&nbsp;&#39;vue&#39;
+import&nbsp;App&nbsp;from&nbsp;&#39;./App&#39;
+import&nbsp;routes1&nbsp;from&nbsp;&#39;./components/Routes1.vue&#39;
+import&nbsp;routes2&nbsp;from&nbsp;&#39;./components/Routes2.vue&#39;
+
+Vue.config.productionTip&nbsp;=&nbsp;false
+
+//&nbsp;-------------路由---------------
+import&nbsp;VueRouter&nbsp;from&nbsp;&#39;vue-router&#39;
+Vue.use(VueRouter)
+&nbsp;
+//配置路由（需要将组件在这里配置给VueRouter才可作为路由使用）
+const&nbsp;router&nbsp;=&nbsp;new&nbsp;VueRouter({
+&nbsp;&nbsp;routes:&nbsp;[
+&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;path:&nbsp;&quot;/routes1&quot;,&nbsp;component:&nbsp;routes1&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;path:&nbsp;&quot;/routes2&quot;,&nbsp;component:&nbsp;routes2&nbsp;},
+&nbsp;&nbsp;],
+&nbsp;&nbsp;//路由模式为历史模式
+&nbsp;&nbsp;//mode:&nbsp;&quot;history&quot;
+})
+//&nbsp;--------------------------------
+&nbsp;
+new&nbsp;Vue({
+&nbsp;&nbsp;router,//路由
+&nbsp;&nbsp;el:&nbsp;&#39;#app&#39;,
+&nbsp;&nbsp;render:&nbsp;h&nbsp;=&gt;&nbsp;h(App),
+})</pre><p><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">App.vue</span></p><pre class="brush:html;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&nbsp;id=&quot;app&quot;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;router-link&nbsp;to=&quot;/routes1&quot;&gt;路由1&lt;/router-link&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;router-link&nbsp;to=&quot;/routes2&quot;&gt;路由2&lt;/router-link&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;router-view&gt;&lt;/router-view&gt;
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;</pre><pre class="brush:js;toolbar:false">&lt;script&gt;
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;name:&nbsp;&quot;App&quot;,
+&nbsp;&nbsp;data()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;{};
+&nbsp;&nbsp;},
+&nbsp;&nbsp;watch:{
+&nbsp;&nbsp;&nbsp;&nbsp;//对路由进行监听
+&nbsp;&nbsp;&nbsp;&nbsp;&#39;$route.path&#39;:function&nbsp;(newVal,oldVal){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;window.console.info(&quot;新路由：&quot;+newVal+&quot;;旧路由：&quot;+oldVal);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+};
+&lt;/script&gt;</pre><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">接下来是其他用于路由展示组件</p><p style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium; white-space: normal;">Routes1.vue</p><pre class="brush:js;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;这是组件routes1
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;name:&nbsp;&quot;routes1&quot;,
+&nbsp;&nbsp;data()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;{};
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;
+
+&lt;style&gt;
+&lt;/style&gt;</pre><p><span style="font-family: &quot;Microsoft YaHei&quot;; font-size: medium;">Routes2.vue</span></p><pre class="brush:js;toolbar:false">&lt;template&gt;
+&nbsp;&nbsp;&lt;div&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;这是routes2组件
+&nbsp;&nbsp;&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export&nbsp;default&nbsp;{
+&nbsp;&nbsp;name:&nbsp;&quot;routes2&quot;,
+&nbsp;&nbsp;data()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;{};
+&nbsp;&nbsp;},
+};
+&lt;/script&gt;
+&nbsp;
+&lt;style&gt;
+&lt;/style&gt;</pre><p><br/></p>  </body>
+  <script type="text/javascript" src="../../ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+  <script type="text/javascript">
+    SyntaxHighlighter.all();    window.setInterval(function changeHeight(){ 
+        window.frameElement.style.height=(window.document.body.scrollHeight+30)+'px';
+    },400);
+  </script>
+</html>
